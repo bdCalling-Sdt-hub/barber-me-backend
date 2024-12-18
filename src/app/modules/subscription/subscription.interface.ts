@@ -1,13 +1,15 @@
-import { Model, Types } from "mongoose";
+import { Model, Types } from 'mongoose';
 
 export type ISubscription = {
-    user: Types.ObjectId;
-    status: 'Active' | 'Deactivate' | "Expired" | "Cancel";
-    subscriptionId: String;
-    priceId: String;
-    price: Number;
-    startDate: String;
-    endDate: String;
-}
+    customerId: string;
+    price: number;
+    barber: Types.ObjectId;
+    package: Types.ObjectId;
+    trxId: string;
+    subscriptionId: string;
+    status: 'expired' | 'active' | 'cancel';
+    currentPeriodStart: string;
+    currentPeriodEnd: string;
+};
 
-export type SubscriptionModel = Model<ISubscription, Record<string, unknown>>
+export type SubscriptionModel = Model<ISubscription, Record<string, unknown>>;

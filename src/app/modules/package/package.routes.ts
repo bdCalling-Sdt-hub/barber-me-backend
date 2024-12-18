@@ -8,12 +8,25 @@ const router = express.Router()
 
 router
     .route("/")
-    .post( validateRequest(PackageValidation.createPackageZodSchema), auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN), PackageController.createPackage)
-    .get(auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN, USER_ROLES.PROFESSIONAL), PackageController.getPackage)
+    .post( 
+        validateRequest(PackageValidation.createPackageZodSchema), 
+        auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN), 
+        PackageController.createPackage
+    )
+    .get(
+        auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN, USER_ROLES.BARBER), 
+        PackageController.getPackage
+    )
 
 router
     .route("/:id")
-    .patch(auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN), PackageController.updatePackage)
-    .get(auth(USER_ROLES.PROFESSIONAL), PackageController.packageDetails)
+    .patch(
+        auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN), 
+        PackageController.updatePackage
+    )
+    .get(
+        auth(USER_ROLES.BARBER), 
+        PackageController.packageDetails
+    )
 
 export const PackageRoutes = router;

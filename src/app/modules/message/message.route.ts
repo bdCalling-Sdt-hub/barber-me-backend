@@ -5,11 +5,11 @@ import { MessageController } from './message.controller';
 const router = express.Router();
 
 router.post('/',
-    auth(USER_ROLES.USER, USER_ROLES.PROFESSIONAL),
+    auth(USER_ROLES.CUSTOMER, USER_ROLES.BARBER),
     MessageController.sendMessage
 );
 router.get('/:id',
-    auth(USER_ROLES.USER, USER_ROLES.PROFESSIONAL),
+    auth(USER_ROLES.CUSTOMER, USER_ROLES.BARBER),
     MessageController.getMessage
 );
 

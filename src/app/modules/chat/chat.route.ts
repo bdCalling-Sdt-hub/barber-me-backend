@@ -5,11 +5,12 @@ import { USER_ROLES } from '../../../enums/user';
 const router = express.Router();
 
 router.post('/:id',
-    auth(USER_ROLES.USER),
+    auth(USER_ROLES.CUSTOMER),
     ChatController.createChat
 );
+
 router.get('/',
-    auth(USER_ROLES.USER),
+    auth(USER_ROLES.CUSTOMER, USER_ROLES.BARBER),
     ChatController.getChat
 );
 

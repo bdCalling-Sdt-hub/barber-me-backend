@@ -5,7 +5,16 @@ import sendResponse from "../../../shared/sendResponse";
 import { StatusCodes } from "http-status-codes";
 
 const createService = catchAsync(async(req: Request, res: Response)=>{
-    const result = await ServiceService.createServiceToDB(req.body);
+    const barber = req.user.id;
+    const services = req.body;
+
+    const payload = services?.map((service:any) =>{
+        return {
+            ...service,
+            barber
+        }
+    })
+    const result = await ServiceService.createServiceToDB(payload);
 
     sendResponse(res, {
         statusCode: StatusCodes.OK,

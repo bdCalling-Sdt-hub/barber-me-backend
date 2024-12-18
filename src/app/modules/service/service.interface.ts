@@ -2,12 +2,17 @@ import { Model, Types } from "mongoose";
 
 
 export type IService = {
-    title: String;
+    title: Types.ObjectId;
+    category: Types.ObjectId;
+    image: String;
     price: Number;
-    professional: Types.ObjectId;
     discount?: Number;
-    gender: "Male" | "Female";
-    category: String;
+    duration: String;
+    description: String;
+    gender: "Male" | "Female" | "Children";
+    barber: Types.ObjectId;
+    rating: Number;
+    totalRating: Number;
 }
 
 export type ServiceModel = Model<IService, Record<string, unknown>>;

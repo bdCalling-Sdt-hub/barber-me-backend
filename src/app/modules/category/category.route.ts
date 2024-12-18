@@ -1,4 +1,4 @@
-import express from 'express'
+import express, { NextFunction, Request, Response } from 'express';
 import { USER_ROLES } from '../../../enums/user'
 import auth from '../../middlewares/auth'
 import validateRequest from '../../middlewares/validateRequest'
@@ -7,27 +7,62 @@ import { CategoryValidation } from './category.validation'
 import fileUploadHandler from '../../middlewares/fileUploaderHandler'
 const router = express.Router()
 
-router.post(
-    '/create-service',
-    auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN), fileUploadHandler(),
-    validateRequest(CategoryValidation.createCategoryZodSchema),
-    CategoryController.createCategory,
-)
+router.route("/")
+    .post(
+        auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN),
+        fileUploadHandler(),
+        async (req: Request, res: Response, next: NextFunction) => {
+            try {
+                const payload = req.body;
 
-router
-    .route('/:id')
+                let image = null;
+
+                if (req.files && "image" in req.files && req.files.image[0]) {
+                    image = `/images/${req.files.image[0].filename}`;
+                }
+
+                req.body = { ...payload, image };
+                next();
+
+            } catch (error) {
+                return res.status(500).json({ message: "Failed to convert string to number" });
+            }
+        },
+        validateRequest(CategoryValidation.createCategoryZodSchema),
+        CategoryController.createCategory
+    )
+    .get(
+        auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN, USER_ROLES.CUSTOMER, USER_ROLES.BARBER),
+        CategoryController.getCategories
+    );
+
+
+router.route("/:id")
     .patch(
-        auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN), fileUploadHandler(),
+        auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN), 
+        fileUploadHandler(),
+        async (req: Request, res: Response, next: NextFunction) => {
+            try {
+                const payload = req.body;
+
+                let image;
+
+                if (req.files && "image" in req.files && req.files.image[0]) {
+                    image = `/images/${req.files.image[0].filename}`;
+                }
+
+                req.body = { ...payload, image };
+                next();
+
+            } catch (error) {
+                return res.status(500).json({ message: "Failed to convert string to number" });
+            }
+        },
         CategoryController.updateCategory,
     )
     .delete(
         auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN),
         CategoryController.deleteCategory,
-    )
-
-router.get('/',
-    auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN, USER_ROLES.USER),
-    CategoryController.getCategories,
-)
+    );
 
 export const CategoryRoutes = router

@@ -7,7 +7,7 @@ import { StatusCodes } from "http-status-codes";
 
 const createReview = catchAsync(async(req:Request, res:Response)=>{
     const payload = {
-        employer: req.user.id,
+        customer: req.user.id,
         ...req.body
     }
     const result = await ReviewService.createReviewToDB(payload);
@@ -20,16 +20,4 @@ const createReview = catchAsync(async(req:Request, res:Response)=>{
     })
 })
 
-const getReview = catchAsync(async(req, res)=>{
-
-    const result = await ReviewService.getReviewFromDB(req.params.id);
-
-    sendResponse(res, {
-        statusCode : StatusCodes.OK,
-        success: true,
-        message: "Review Retrieved Successfully",
-        data: result
-    })
-})
-
-export  const ReviewController = {createReview, getReview}
+export  const ReviewController = {createReview}

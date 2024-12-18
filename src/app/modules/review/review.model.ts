@@ -3,12 +3,12 @@ import { IReview, ReviewModel } from "./review.interface";
 
 const reviewSchema = new Schema<IReview, ReviewModel>(
     {
-        user: {
+        barber: {
             type: Schema.Types.ObjectId,
             ref: "User",
             required: true,
         },
-        professional: {
+        customer: {
             type: Schema.Types.ObjectId,
             ref: "User",
             required: true,

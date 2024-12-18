@@ -5,17 +5,14 @@ import { Bookmark } from "./bookmark.model";
 import { JwtPayload } from "jsonwebtoken";
 import mongoose from "mongoose";
 
-const toggleBookmark = async (payload: {user: JwtPayload, service: string}): Promise<string> => {
+const toggleBookmark = async (payload: { customer: string, barber: string }): Promise<string> => {
 
-    if(!mongoose.Types.ObjectId.isValid(payload.service)){
-        throw new ApiError(StatusCodes.NOT_ACCEPTABLE, "Invalid ")
+    if (!mongoose.Types.ObjectId.isValid(payload.barber)) {
+        throw new ApiError(StatusCodes.NOT_ACCEPTABLE, "Invalid Barber ID")
     }
 
     // Check if the bookmark already exists
-    const existingBookmark = await Bookmark.findOne({
-        user: payload.user,
-        service: payload.service
-    });
+    const existingBookmark = await Bookmark.findOne(payload);
 
     if (existingBookmark) {
         // If the bookmark exists, delete it
@@ -33,18 +30,16 @@ const toggleBookmark = async (payload: {user: JwtPayload, service: string}): Pro
 };
 
 
-const getBookmark = async (user: JwtPayload): Promise<IBookmark[]>=>{
+const getBookmark = async (user: JwtPayload): Promise<IBookmark[]> => {
 
-
-
-    const result:any = await Bookmark.find({ user: user?.id })
+    const result: any = await Bookmark.find({ customer: user?.id })
         .populate({
-            path: 'service',
-            model: 'Service'
-        }).select("service")
-    
+            path: 'barber',
+            model: 'User'
+        }).select("barber")
+
 
     return result;
 }
 
-export const BookmarkService = {toggleBookmark, getBookmark}
+export const BookmarkService = { toggleBookmark, getBookmark }

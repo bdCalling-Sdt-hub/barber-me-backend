@@ -8,11 +8,13 @@ const router = express.Router()
 
 router
     .route("/")
-    .post(validateRequest(ServiceValidation.createServiceZodSchema), auth(USER_ROLES.PROFESSIONAL), ServiceController.createService)
-    .get(auth(USER_ROLES.USER, USER_ROLES.PROFESSIONAL), ServiceController.getService)
+    .post(
+        validateRequest(ServiceValidation.createServiceZodSchema), 
+        auth(USER_ROLES.BARBER), ServiceController.createService
+    )
 
 router
     .route("/:id")
-    .patch(auth(USER_ROLES.PROFESSIONAL), ServiceController.updateService)
+    .patch(auth(USER_ROLES.BARBER), ServiceController.updateService)
 
 export const ServiceRoutes = router;

@@ -1,8 +1,8 @@
 import { Model, Types } from "mongoose";
 
 export type IBookmark= {
-    user: Types.ObjectId,
-    service: Types.ObjectId
+    customer: Types.ObjectId,
+    barber: Types.ObjectId
 }
 
 export type BookmarkModel = Model<IBookmark>;

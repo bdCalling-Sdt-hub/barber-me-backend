@@ -5,8 +5,8 @@ import { Service } from "./service.model";
 import mongoose from "mongoose";
 import { JwtPayload } from "jsonwebtoken";
 
-const createServiceToDB = async(payload: IService): Promise<IService | null>=>{
-    const result = await Service.create(payload);
+const createServiceToDB = async(payload: IService): Promise<IService[] | null>=>{
+    const result = await Service.insertMany(payload);
     if(!result){
         throw new ApiError(StatusCodes.BAD_REQUEST, "Failed to created Service")
     }
@@ -35,7 +35,7 @@ const updateServiceToDB = async(id: string, payload: IService): Promise<IService
 
 
 const getServiceFromDB = async(user: JwtPayload): Promise<IService[]>=>{
-    const result = await Service.find({professional: user.id});
+    const result = await Service.find({barber: user.id});
     return result;
 }
 

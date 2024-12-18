@@ -8,15 +8,24 @@ const packageSchema = new Schema<IPackage, PackageModel>(
             type: String,
             required: true
         },
+        description: {
+            type: String,
+            required: true
+        },
         price: {
             type: Number,
             required: true
         },
         duration: {
             type: String,
+            enum: ["month", "year"],
             required: true
         },
         priceId: {
+            type: String,
+            required: true
+        },
+        productId: {
             type: String,
             required: true
         },
@@ -33,4 +42,4 @@ const packageSchema = new Schema<IPackage, PackageModel>(
     }
 )
 
-export const Package = model<IPackage, PackageModel>("Package", packageSchema)
+export const Package = model<IPackage, PackageModel>("Package", packageSchema);

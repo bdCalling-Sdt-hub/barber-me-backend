@@ -4,9 +4,9 @@ import sendResponse from "../../../shared/sendResponse";
 import { BookmarkService } from "./bookmark.service";
 
 const toggleBookmark = catchAsync(async(req: Request, res: Response)=>{
-    const user = req.user.id;
-    const service = req.params.id;
-    const payload:any = { user, service }
+    const customer = req.user.id;
+    const barber = req.body.barber;
+    const payload:any = { customer, barber }
     const result = await BookmarkService.toggleBookmark(payload);
     
     sendResponse(res, {

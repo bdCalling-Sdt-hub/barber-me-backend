@@ -1,13 +1,13 @@
 import { z } from 'zod'
 import { objectIdZodSchema } from '../../../helpers/checkObjectIdZodSchemaHelper'
 
-const createServiceZodSchema = z.object({
+const createSubCategoryZodSchema = z.object({
     body: z.object({
-        title: z.string({required_error: "Title is required"}),
         category : objectIdZodSchema("Category Id"),
+        title: z.string({ required_error: 'Sub Category is required' })
     })
 })
 
-export const ServiceValidation = {
-    createServiceZodSchema
+export const SubCategoryValidation = {
+    createSubCategoryZodSchema
 }
