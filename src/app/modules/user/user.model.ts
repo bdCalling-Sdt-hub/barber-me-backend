@@ -58,6 +58,23 @@ const userSchema = new Schema<IUser, UserModal>(
         isSubscribed: {
             type: Boolean
         },
+        about: {
+            type: String,
+            required: false
+        },
+        address: {
+            type: String,
+            required: false
+        },
+        dateOfBirth: {
+            type: String,
+            required: false
+        },
+        gender: {
+            type: String,
+            enum: ["Male", "Female", "Children", 'Others'],
+            required: false
+        },
         authentication: {
             type: {
                 isResetPassword: {
@@ -129,6 +146,8 @@ userSchema.pre('save', async function (next) {
         user.accountInformation = {
             status: false
         };
+
+        user.about = ''
 
         // if role is BARBER the isSubscribe initially set as false
         user.isSubscribed = false

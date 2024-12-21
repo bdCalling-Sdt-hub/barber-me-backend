@@ -48,6 +48,9 @@ const deleteSubCategoryToDB = async (id: string): Promise<ISubCategory | null> =
   return deleteCategory
 }
 
+
+
+
 export const SubCategoryService = {
   createSubCategoryToDB,
   getSubCategoriesFromDB,

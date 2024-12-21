@@ -37,9 +37,14 @@ router.route("/")
     );
 
 
+router.get("/barber",
+    auth(USER_ROLES.BARBER),
+    CategoryController.getCategoryForBarber
+)
+
 router.route("/:id")
     .patch(
-        auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN), 
+        auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN),
         fileUploadHandler(),
         async (req: Request, res: Response, next: NextFunction) => {
             try {

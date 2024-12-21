@@ -7,13 +7,12 @@ import sendResponse from '../../../shared/sendResponse';
 // register user
 const createUser = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     const { ...userData } = req.body;
-    const result = await UserService.createUserToDB(userData);
+    await UserService.createUserToDB(userData);
 
     sendResponse(res, {
         success: true,
         statusCode: StatusCodes.OK,
-        message: 'User created successfully',
-        data: result
+        message: 'Please check your email to verify your account. We have sent you an OTP to complete the registration process.',
     })
 });
 

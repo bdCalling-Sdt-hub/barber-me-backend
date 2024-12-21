@@ -103,6 +103,18 @@ const resendVerificationEmail = catchAsync(async (req: Request, res: Response) =
     });
 });
 
+// delete user
+const deleteUser = catchAsync(async (req: Request, res: Response) => {
+    const result = await AuthService.deleteUserFromDB(req.user);
+
+    sendResponse(res, {
+        success: true,
+        statusCode: StatusCodes.OK,
+        message: 'Account Deleted successfully',
+        data: result
+    });
+});
+
 export const AuthController = {
     verifyEmail,
     loginUser,
@@ -111,5 +123,6 @@ export const AuthController = {
     changePassword,
     newAccessToken,
     resendVerificationEmail,
-    socialLogin
+    socialLogin,
+    deleteUser
 };

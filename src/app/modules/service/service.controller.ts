@@ -5,16 +5,7 @@ import sendResponse from "../../../shared/sendResponse";
 import { StatusCodes } from "http-status-codes";
 
 const createService = catchAsync(async(req: Request, res: Response)=>{
-    const barber = req.user.id;
-    const services = req.body;
-
-    const payload = services?.map((service:any) =>{
-        return {
-            ...service,
-            barber
-        }
-    })
-    const result = await ServiceService.createServiceToDB(payload);
+    const result = await ServiceService.createServiceToDB(req.body);
 
     sendResponse(res, {
         statusCode: StatusCodes.OK,
@@ -35,8 +26,8 @@ const updateService = catchAsync(async(req: Request, res: Response)=>{
     })
 })
 
-const getService = catchAsync(async(req: Request, res: Response)=>{
-    const result = await ServiceService.getServiceFromDB(req.user);
+const getServiceForBarber = catchAsync(async(req: Request, res: Response)=>{
+    const result = await ServiceService.getServiceForBarberFromDB(req.user, req.query.category as string);
 
     sendResponse(res, {
         statusCode: StatusCodes.OK,
@@ -46,8 +37,20 @@ const getService = catchAsync(async(req: Request, res: Response)=>{
     })
 })
 
+const holdService = catchAsync(async(req: Request, res: Response)=>{
+    const result = await ServiceService.holdServiceFromDB(req.user);
+
+    sendResponse(res, {
+        statusCode: StatusCodes.OK,
+        success: true,
+        message: "Service Hold Successfully",
+        data: result
+    })
+})
+
 export const ServiceController = {
     createService,
     updateService,
-    getService
+    getServiceForBarber,
+    holdService
 }

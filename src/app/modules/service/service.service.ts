@@ -2,31 +2,79 @@ import { StatusCodes } from "http-status-codes";
 import ApiError from "../../../errors/ApiError";
 import { IService } from "./service.interface";
 import { Service } from "./service.model";
-import mongoose from "mongoose";
+import mongoose, { UpdateWriteOpResult } from "mongoose";
 import { JwtPayload } from "jsonwebtoken";
+import unlinkFile from "../../../shared/unlinkFile";
 
-const createServiceToDB = async(payload: IService): Promise<IService[] | null>=>{
-    const result = await Service.insertMany(payload);
-    if(!result){
-        throw new ApiError(StatusCodes.BAD_REQUEST, "Failed to created Service")
+const createServiceToDB = async (payload: IService[]): Promise<IService[] | null> => {
+
+    if (!payload || payload.length === 0) {
+        throw new ApiError(StatusCodes.BAD_REQUEST, "No services provided");
     }
 
-    return result;
-}
+    // retrieved existing services based on the payload
+    const existingServices = await Service.find({
+        $or: payload.map(service => ({
+            title: service.title,
+            category: service.category,
+            barber: service.barber
+        }))
+    });
 
-const updateServiceToDB = async(id: string, payload: IService): Promise<IService | null>=>{
+    // Filter payload to exclude existing services
+    const filteredPayload = payload.filter(service =>
+        !existingServices.some(existing =>
+            existing.title.toString() === service.title.toString() &&
+            existing.category.toString() === service.category.toString() &&
+            existing.barber.toString() === service.barber.toString()
+        )
+    );
 
-    if(!mongoose.Types.ObjectId.isValid(id)){
-        throw new ApiError(StatusCodes.BAD_REQUEST, "Invalid ID")
+    // Delete existing services
+    if (existingServices.length > 0) {
+        await Service.deleteMany({
+            $or: existingServices?.map(service => ({
+                title: service.title,
+                category: service.category,
+                barber: service.barber
+            }))
+        });
+    }
+
+    // Step 4: If no new services to insert, return an error
+    if (filteredPayload.length === 0) {
+        throw new ApiError(StatusCodes.BAD_REQUEST, "All provided services already exist");
+    }
+
+    // Insert the new services
+    const insertedServices = await Service.insertMany(filteredPayload);
+    if (!insertedServices || insertedServices.length === 0) {
+        throw new ApiError(StatusCodes.BAD_REQUEST, "Failed to create services");
+    }
+
+    // Return the newly created services
+    return insertedServices;
+};
+
+
+const updateServiceToDB = async (id: string, payload: IService): Promise<IService | null> => {
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+        throw new ApiError(StatusCodes.BAD_REQUEST, "Invalid Service Object ID")
+    }
+
+    const isExistService = await Service.findById(id);
+    if (isExistService?.image?.startsWith("/images")) {
+        unlinkFile(isExistService.image as string);
     }
 
     const result = await Service.findByIdAndUpdate(
-        {_id: id},
+        { _id: id },
         payload,
-        { new: true } 
+        { new: true }
     );
 
-    if(!result){
+    if (!result) {
         throw new ApiError(StatusCodes.BAD_REQUEST, "Failed to Update Service")
     }
 
@@ -34,13 +82,27 @@ const updateServiceToDB = async(id: string, payload: IService): Promise<IService
 }
 
 
-const getServiceFromDB = async(user: JwtPayload): Promise<IService[]>=>{
-    const result = await Service.find({barber: user.id});
+const getServiceForBarberFromDB = async (user: JwtPayload, category: string): Promise<IService[]> => {
+    const result = await Service.find({ barber: user.id, category: category })
+        .select("title duration price image");
+    return result;
+}
+
+// hold service
+const holdServiceFromDB = async (user: JwtPayload): Promise<UpdateWriteOpResult> => {
+
+    const result = await Service.updateMany(
+        { barber: user.id }, 
+        { status: "Inactive" },
+        {new : true}
+    );
+
     return result;
 }
 
 export const ServiceService = {
     createServiceToDB,
     updateServiceToDB,
-    getServiceFromDB
+    getServiceForBarberFromDB,
+    holdServiceFromDB
 }

@@ -17,6 +17,7 @@ import generateOTP from '../../../util/generateOTP';
 import { ResetToken } from '../resetToken/resetToken.model';
 import { User } from '../user/user.model';
 import { IUser } from '../user/user.interface';
+import { Service } from '../service/service.model';
 
 //login
 const loginUserFromDB = async (payload: ILoginData) => {
@@ -279,7 +280,6 @@ const resendVerificationEmailToDB = async (email: string) => {
 };
 
 // social authentication
-
 const socialLoginFromDB = async (payload: IUser) => {
 
     const { appId, role } = payload;
@@ -329,6 +329,20 @@ const socialLoginFromDB = async (payload: IUser) => {
     }
 }
 
+// delete user
+const deleteUserFromDB = async (user: JwtPayload) => {
+
+    const isExistUser = await User.findByIdAndDelete(user.id);
+    if (!isExistUser) {
+        throw new ApiError(StatusCodes.BAD_REQUEST, "User doesn't exist!");
+    }
+    await Service.updateMany(
+        { barber: user.id },
+        {status: 'Inactive'},
+        {new: true}
+    );
+};
+
 export const AuthService = {
     verifyEmailToDB,
     loginUserFromDB,
@@ -337,5 +351,6 @@ export const AuthService = {
     changePasswordToDB,
     newAccessTokenToUser,
     resendVerificationEmailToDB,
-    socialLoginFromDB
+    socialLoginFromDB,
+    deleteUserFromDB
 };

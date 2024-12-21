@@ -5,6 +5,9 @@ import { Category } from './category.model'
 import unlinkFile from '../../../shared/unlinkFile'
 import { Bookmark } from '../bookmark/bookmark.model'
 import mongoose from 'mongoose'
+import { JwtPayload } from 'jsonwebtoken'
+import { SubCategory } from '../subCategory/subCategory.model'
+import { Service } from '../service/service.model'
 
 const createCategoryToDB = async (payload: ICategory) => {
   const { name, image } = payload;
@@ -66,9 +69,37 @@ const deleteCategoryToDB = async (id: string): Promise<ICategory | null> => {
   return deleteCategory
 }
 
+const getCategoryForBarberFromDB = async (user: JwtPayload): Promise<ICategory[] | null> => {
+
+  const categories = await Category.find().select("name").lean();
+  if (!categories) {
+    throw new ApiError(StatusCodes.BAD_REQUEST, "Category doesn't exist")
+  }
+
+  const result = await Promise.all(categories?.map(async (category: any) => {
+    const subCategories = await SubCategory.find({ category: category._id }).select("title").lean();
+
+    const finalResult = await Promise.all(subCategories?.map(async (subCategory: any) => {
+      const service = await Service.findOne({ title: subCategory?._id, category: category._id, barber: user.id });
+      return {
+        ...subCategory,
+        isServiceAdded: !!service
+      }
+    }));
+
+    return {
+      ...category,
+      subCategory: finalResult
+    }
+  }));
+
+  return result
+}
+
 export const CategoryService = {
   createCategoryToDB,
   getCategoriesFromDB,
   updateCategoryToDB,
-  deleteCategoryToDB
+  deleteCategoryToDB,
+  getCategoryForBarberFromDB
 }

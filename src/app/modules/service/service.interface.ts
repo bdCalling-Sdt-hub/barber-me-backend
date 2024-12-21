@@ -9,9 +9,11 @@ export type IService = {
     discount?: Number;
     duration: String;
     description: String;
-    gender: "Male" | "Female" | "Children";
+    gender: "Male" | "Female" | "Children" | "Others";
     barber: Types.ObjectId;
+    isOffered: Boolean;
     rating: Number;
+    status: "Active" | "Inactive";
     totalRating: Number;
 }
 

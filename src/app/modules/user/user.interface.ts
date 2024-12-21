@@ -24,6 +24,10 @@ export type IUser = {
     password: string;
     isSubscribed?: boolean;
     location: {};
+    address:string
+    about:string
+    dateOfBirth:string;
+    gender: "Male" | "Female" | "Children" | "Others";
     profile: string;
     verified: boolean;
     authentication?: IAuthenticationProps;

@@ -52,10 +52,23 @@ const deleteCategory = catchAsync(async (req: Request, res: Response) => {
     })
 })
 
+const getCategoryForBarber = catchAsync(async (req: Request, res: Response) => {
+
+    const result = await CategoryService.getCategoryForBarberFromDB(req.user)
+
+    sendResponse(res, {
+        success: true,
+        statusCode: StatusCodes.OK,
+        message: 'Barber category successfully',
+        data: result
+    })
+})
+
 
 export const CategoryController = {
     createCategory,
     getCategories,
     updateCategory,
-    deleteCategory
+    deleteCategory,
+    getCategoryForBarber
 }

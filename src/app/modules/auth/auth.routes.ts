@@ -30,7 +30,7 @@ router.post(
         try {
             const { email, oneTimeCode } = req.body;
 
-            req.body = { email, oneTimeCode: Number(oneTimeCode) };
+            req.body = { email, oneTimeCode: Number(oneTimeCode)};
             next();
 
         } catch (error) {
@@ -62,6 +62,12 @@ router.post(
     auth(USER_ROLES.ADMIN, USER_ROLES.BARBER, USER_ROLES.CUSTOMER, USER_ROLES.SUPER_ADMIN),
     validateRequest(AuthValidation.createChangePasswordZodSchema),
     AuthController.changePassword
+);
+
+router.delete(
+    '/delete-account',
+    auth(USER_ROLES.ADMIN, USER_ROLES.BARBER, USER_ROLES.CUSTOMER, USER_ROLES.SUPER_ADMIN),
+    AuthController.deleteUser
 );
 
 export const AuthRoutes = router;
