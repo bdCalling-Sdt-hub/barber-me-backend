@@ -2,6 +2,10 @@ import { JwtPayload } from "jsonwebtoken";
 import { User } from "../user/user.model";
 import { Portfolio } from "../portfolio/portfolio.model";
 import { Review } from "../review/review.model";
+import ApiError from "../../../errors/ApiError";
+import { StatusCodes } from "http-status-codes";
+import mongoose from "mongoose";
+import { Reservation } from "../reservation/reservation.model";
 
 const getBarberProfileFromDB = async (user: JwtPayload): Promise<{}> => {
 
@@ -49,6 +53,47 @@ const getBarberProfileFromDB = async (user: JwtPayload): Promise<{}> => {
     return result;
 }
 
+const getCustomerProfileFromDB = async (customer: string): Promise<{}> => {
+
+    if(!mongoose.Types.ObjectId.isValid(customer)) {
+        throw new ApiError(StatusCodes.BAD_REQUEST, "Invalid Customer ID")
+    }
+
+    const [customerProfile, serviceCount, totalSpend] = await Promise.all([
+        User.findById({_id: customer}).select("name profile address gender dateOfBirth").lean(),
+        Reservation.countDocuments({ customer: customer, status: "Completed", paymentStatus: "Paid" }),
+        Reservation.aggregate([
+            {
+                $match: { 
+                    customer: customer,
+                    status: "Completed",
+                    paymentStatus: "Paid"
+                }
+            },
+            {
+                $group: {
+                    _id: null,
+                    totalSpend: { $sum: "$price" }
+                }
+            }
+        ])
+    ]);
+
+    if (!customerProfile) {    
+        throw new Error("Customer not found");
+    }
+
+    const result = {
+        ...customerProfile,
+        serviceCount,
+        totalSpend: totalSpend[0]?.totalSpend || 0
+    }
+
+    return result;
+}
+
+
 export const BarberService = {
-    getBarberProfileFromDB
+    getBarberProfileFromDB,
+    getCustomerProfileFromDB
 }

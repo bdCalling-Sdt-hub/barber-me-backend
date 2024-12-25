@@ -12,12 +12,21 @@ const notificationSchema = new Schema<INotification, NotificationModel>(
             ref: 'User',
             required: true
         },
+        referenceId: {
+            type: String,
+            required: false
+        },
+        screen: {
+            type: String,
+            required: false
+        },
         read: {
             type: Boolean,
             default: false
         },
         type: {
             type: String,
+            enum: ['ADMIN'],
             required: false
         }
     },

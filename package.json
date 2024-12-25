@@ -1,5 +1,5 @@
 {
-  "name": "barbar-me",
+  "name": "barber-me",
   "version": "1.0.0",
   "main": "app.ts",
   "scripts": {
@@ -24,6 +24,7 @@
     "bcrypt": "^5.1.1",
     "colors": "^1.4.0",
     "cors": "^2.8.5",
+    "crypto": "^1.0.1",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
     "http-status-codes": "^2.3.0",

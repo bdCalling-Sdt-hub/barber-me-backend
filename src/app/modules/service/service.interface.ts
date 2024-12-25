@@ -15,6 +15,7 @@ export type IService = {
     rating: Number;
     status: "Active" | "Inactive";
     totalRating: Number;
+    isReported: boolean
 }
 
 export type ServiceModel = Model<IService, Record<string, unknown>>;

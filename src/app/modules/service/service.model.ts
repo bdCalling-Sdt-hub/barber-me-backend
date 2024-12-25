@@ -62,6 +62,10 @@ const serviceSchema = new Schema<IService, ServiceModel>(
             type: String,
             enum: ["Active", "Inactive"],
             default: "Active"
+        },
+        isReported: {
+            type: Boolean,
+            default: false
         }
     },
     {

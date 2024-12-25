@@ -15,6 +15,18 @@ const getBarberProfile = catchAsync(async (req: Request, res: Response)=> {
     });
 });
 
+const getCustomerProfile = catchAsync(async (req: Request, res: Response)=> {
+    const result = await BarberService.getCustomerProfileFromDB(req.params.id);
+
+    sendResponse(res, {
+        statusCode: StatusCodes.OK,
+        success: true,
+        message: "Customer profile found",
+        data: result
+    });
+});
+
 export const BarberController = {
-    getBarberProfile
+    getBarberProfile,
+    getCustomerProfile
 }

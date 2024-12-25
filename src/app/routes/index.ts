@@ -15,6 +15,8 @@ import { ServiceRoutes } from '../modules/service/service.routes';
 import { SubCategoryRoutes } from '../modules/subCategory/subCategory.route';
 import { PortfolioRoutes } from '../modules/portfolio/portfolio.route';
 import { BarberRoutes } from '../modules/barber/barber.routes';
+import { ReservationRoutes } from '../modules/reservation/reservation.routes';
+import { ReportRoutes } from '../modules/report/report.routes';
 const router = express.Router();
 
 const apiRoutes = [
@@ -34,6 +36,8 @@ const apiRoutes = [
     { path: "/service", route: ServiceRoutes },
     { path: "/portfolio", route: PortfolioRoutes },
     { path: "/barber", route: BarberRoutes },
+    { path: "/reservation", route: ReservationRoutes },
+    { path: "/report", route: ReportRoutes },
 ]
 
 apiRoutes.forEach(route => router.use(route.path, route.route));

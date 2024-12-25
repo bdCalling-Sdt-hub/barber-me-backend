@@ -7,6 +7,11 @@ const router = express.Router();
 router.get('/',
     auth(USER_ROLES.BARBER),
     BarberController.getBarberProfile
-)
+);
+
+router.get('/:id',
+    auth(USER_ROLES.BARBER),
+    BarberController.getCustomerProfile
+);
 
 export const BarberRoutes = router;
