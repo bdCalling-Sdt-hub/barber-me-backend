@@ -6,7 +6,7 @@ const router = express.Router();
 
 
 router.post('/', 
-    auth(USER_ROLES.CUSTOMER),
+    auth(USER_ROLES.BARBER),
     ReportController.createReport
 );
 

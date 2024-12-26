@@ -1,7 +1,7 @@
 import { JwtPayload } from "jsonwebtoken";
 import { User } from "../user/user.model";
 import { Portfolio } from "../portfolio/portfolio.model";
-import { Review } from "../review/review.model";
+import { Review } from "../review/review.model"; 
 import ApiError from "../../../errors/ApiError";
 import { StatusCodes } from "http-status-codes";
 import mongoose from "mongoose";
@@ -10,7 +10,7 @@ import { Reservation } from "../reservation/reservation.model";
 const getBarberProfileFromDB = async (user: JwtPayload): Promise<{}> => {
 
     const [barber, portfolios, reviews, rating] = await Promise.all([
-        User.findById(user.id).select("name email profile about address contact gender dateOfBirth").lean(),
+        User.findById(user.id).select("name email profile about accountInformation address contact gender dateOfBirth").lean(),
         Portfolio.find({ barber: user.id }).select("image"),
         Review.find({ barber: user.id }).populate({ path: "barber", select: "name" }).select("barber comment createdAt rating"),
         Review.aggregate([

@@ -5,7 +5,7 @@ import sendResponse from "../../../shared/sendResponse";
 
 const createReport = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     const payload = {
-        customer: req.user.id,
+        barber: req.user.id,
         ...req.body
     };
     const result = await ReportService.createReportToDB(payload);

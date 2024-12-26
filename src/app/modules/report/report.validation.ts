@@ -3,7 +3,7 @@ import { objectIdZodSchema } from "../../../helpers/checkObjectIdZodSchemaHelper
 
 const createReportZodSchema = z.object({
     body: z.object({
-        barber: objectIdZodSchema("Barber Object Id is required"),
+        customer: objectIdZodSchema("Customer Object Id is required"),
         service: objectIdZodSchema("Service Object Id is required"),
         reason: z.array(z.string({ required_error: 'Reason is required' }))
     })  

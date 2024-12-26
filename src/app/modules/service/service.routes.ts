@@ -40,7 +40,18 @@ router
     .patch(
         auth(USER_ROLES.BARBER),
         ServiceController.holdService
-    )
+    );
+
+
+router.get("/special-offer",
+    auth(USER_ROLES.CUSTOMER),
+    ServiceController.specialOfferService
+);
+    
+router.get("/recommended",
+    auth(USER_ROLES.CUSTOMER),
+    ServiceController.recommendedService
+);
 
 router
     .route("/:id")

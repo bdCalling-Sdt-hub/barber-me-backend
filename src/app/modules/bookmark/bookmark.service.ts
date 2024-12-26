@@ -5,10 +5,14 @@ import { Bookmark } from "./bookmark.model";
 import { JwtPayload } from "jsonwebtoken";
 import mongoose from "mongoose";
 
-const toggleBookmark = async (payload: { customer: string, barber: string }): Promise<string> => {
+const toggleBookmark = async (payload: { customer: string, barber: string, service: string }): Promise<string> => {
 
     if (!mongoose.Types.ObjectId.isValid(payload.barber)) {
         throw new ApiError(StatusCodes.NOT_ACCEPTABLE, "Invalid Barber ID")
+    }
+
+    if (!mongoose.Types.ObjectId.isValid(payload.service)) {
+        throw new ApiError(StatusCodes.NOT_ACCEPTABLE, "Invalid Service ID")
     }
 
     // Check if the bookmark already exists

@@ -43,6 +43,7 @@ const barberReservationFromDB = async (user: JwtPayload, status: string): Promis
             },
             {
                 path: 'service',
+                select: "title category ",
                 populate: [
                     {
                         path: "title",
@@ -73,7 +74,7 @@ const barberReservationFromDB = async (user: JwtPayload, status: string): Promis
 const customerReservationFromDB = async (user: JwtPayload, status: string): Promise<IReservation[]> => {
 
     const condition: any = {
-        barber: user.id
+        customer: user.id
     }
 
     if (status) {
@@ -88,6 +89,7 @@ const customerReservationFromDB = async (user: JwtPayload, status: string): Prom
             },
             {
                 path: 'service',
+                select: "title category rating totalRating",
                 populate: [
                     {
                         path: "title",
@@ -100,7 +102,7 @@ const customerReservationFromDB = async (user: JwtPayload, status: string): Prom
                 ]
             }
         ])
-        .select("customer service createdAt status price");
+        .select("barber service createdAt status price");
 
 
     if (!reservation) throw [];
@@ -180,7 +182,7 @@ const reservationDetailsFromDB = async (id: string): Promise<{ reservation: IRes
 
     if (!reservation) throw new ApiError(StatusCodes.NOT_FOUND, 'Reservation not found');
 
-    const report = await Report.findOne({ service: id });
+    const report = await Report.findOne({ reservation: id }).select("reason");
 
     return { reservation, report, };
 }
@@ -232,6 +234,7 @@ const respondedReservationFromDB = async (id: string, status: string): Promise<I
     
     return updatedReservation;
 }
+
 
 export const ReservationService = {
     createReservationToDB,

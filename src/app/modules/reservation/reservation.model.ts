@@ -37,10 +37,13 @@ const ReservationSchema = new Schema<IReservation, ReservationModel>(
         txid: {
             type: String,
             unique: true,
-            index: true,
-            required: true
+            index: true
         },
         cancelByCustomer: {
+            type: Boolean,
+            default: false
+        },
+        isReported: {
             type: Boolean,
             default: false
         }

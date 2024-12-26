@@ -1,8 +1,8 @@
 import { model, Schema } from "mongoose";
 import { IReport, ReportModel } from "./report.interface";
-import { Service } from "../service/service.model";
 import ApiError from "../../../errors/ApiError";
 import { StatusCodes } from "http-status-codes";
+import { Reservation } from "../reservation/reservation.model";
 
 const reportSchema = new Schema<IReport, ReportModel>(
     {
@@ -16,10 +16,10 @@ const reportSchema = new Schema<IReport, ReportModel>(
             required: true,
             ref: "User"
         },
-        service: {
+        reservation: {
             type: Schema.Types.ObjectId,
             required: true,
-            ref: "User"
+            ref: "Reservation"
         },
         reason: [
             {
@@ -37,14 +37,14 @@ reportSchema.pre('save', async function (next) {
 
     const report = this as IReport;
 
-    const updatedService = await Service.findOneAndUpdate(
-        { _id: report.service },
+    const updatedReservation = await Reservation.findOneAndUpdate(
+        { _id: report.reservation },
         { isReported: true },
         { new: true }
     );
 
-    if (!updatedService) {
-        return next(new ApiError(StatusCodes.BAD_REQUEST, 'Service Not Found'));
+    if (!updatedReservation) {
+        return next(new ApiError(StatusCodes.BAD_REQUEST, 'Reservation Not Found'));
     }
 
     next();
