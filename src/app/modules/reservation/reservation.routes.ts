@@ -48,6 +48,10 @@ router.route("/:id")
         auth(USER_ROLES.BARBER),
         ReservationController.respondedReservation
     )
+    .delete(
+        auth(USER_ROLES.CUSTOMER),
+        ReservationController.cancelReservation
+    );
 
 
 export const ReservationRoutes = router;

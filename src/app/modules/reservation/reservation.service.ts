@@ -236,11 +236,38 @@ const respondedReservationFromDB = async (id: string, status: string): Promise<I
 }
 
 
+const cancelReservationFromDB = async (id: string): Promise<IReservation | null> => {
+
+    if (!mongoose.Types.ObjectId.isValid(id)) throw new ApiError(StatusCodes.BAD_REQUEST, 'Invalid Reservation ID');
+
+    const updatedReservation = await Reservation.findOneAndUpdate(
+        { _id: id },
+        { cancelByCustomer: true },
+        { new: true }
+    );
+
+    if(!updatedReservation) {
+        throw new ApiError(StatusCodes.NOT_FOUND, 'Failed to update reservation');
+    }else{
+        const data = {
+            text: "A customer has requested to cancel your reservation",
+            receiver: updatedReservation.barber,
+            referenceId: id,
+            screen: "RESERVATION"
+        }
+        sendNotifications(data);
+    }
+
+    return updatedReservation;
+}
+
+
 export const ReservationService = {
     createReservationToDB,
     barberReservationFromDB,
     customerReservationFromDB,
     reservationSummerForBarberFromDB,
     reservationDetailsFromDB,
-    respondedReservationFromDB
+    respondedReservationFromDB,
+    cancelReservationFromDB
 }

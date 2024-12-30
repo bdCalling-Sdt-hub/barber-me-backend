@@ -46,6 +46,14 @@ const ReservationSchema = new Schema<IReservation, ReservationModel>(
         isReported: {
             type: Boolean,
             default: false
+        },
+        sessionId: {
+            type: String,
+            required: false
+        },
+        transfer: {
+            type: Boolean,
+            default: false
         }
 
     },

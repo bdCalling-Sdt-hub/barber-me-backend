@@ -9,7 +9,9 @@ export type IReservation = {
     price: number;
     txid: string;
     cancelByCustomer: boolean;
-    isReported: boolean
+    isReported: boolean;
+    sessionId?: string;
+    transfer?: boolean;
 }
 
 export type ReservationModel = Model<IReservation, Record<string, unknown>>;

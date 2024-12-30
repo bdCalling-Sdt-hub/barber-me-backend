@@ -25,6 +25,7 @@ const userSchema = new Schema<IUser, UserModal>(
             type: String,
             required: false,
             unique: true,
+            immutable: true,
             lowercase: true,
         },
         contact: {
@@ -94,7 +95,7 @@ const userSchema = new Schema<IUser, UserModal>(
         },
         accountInformation: {
             status: {type: Boolean},
-            stripeAccountId: {type: String},
+            accountId: {type: String},
             externalAccountId: {type: String},
             accountUrl: {type: String},
             currency: {type: String}

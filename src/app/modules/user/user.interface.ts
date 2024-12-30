@@ -3,7 +3,7 @@ import { USER_ROLES } from '../../../enums/user';
 
 interface IStripeAccountInfo {
     status?: boolean;
-    stripeAccountId?: string;
+    accountId?: string;
     externalAccountId?: string;
     accountUrl?: string;
     currency?: string;

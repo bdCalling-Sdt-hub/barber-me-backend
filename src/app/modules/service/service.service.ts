@@ -6,6 +6,8 @@ import mongoose, { UpdateWriteOpResult } from "mongoose";
 import { JwtPayload } from "jsonwebtoken";
 import unlinkFile from "../../../shared/unlinkFile";
 import { Bookmark } from "../bookmark/bookmark.model";
+import { Category } from "../category/category.model";
+import { SubCategory } from "../subCategory/subCategory.model";
 
 const createServiceToDB = async (payload: IService[]): Promise<IService[] | null> => {
 
@@ -107,11 +109,11 @@ const specialOfferServiceFromDB = async (user: JwtPayload, category: string): Pr
         isOffered: true
     }
 
-    if( category && !mongoose.Types.ObjectId.isValid(category)){
+    if (category && !mongoose.Types.ObjectId.isValid(category)) {
         throw new ApiError(StatusCodes.BAD_REQUEST, "Invalid Category ID")
     }
 
-    if(category){
+    if (category) {
         condition['category'] = category;
     }
 
@@ -149,14 +151,14 @@ const specialOfferServiceFromDB = async (user: JwtPayload, category: string): Pr
 const recommendedServiceFromDB = async (user: JwtPayload, category: string): Promise<IService[]> => {
 
     const condition: Record<string, any> = {
-        rating: { $gte: 0  }
+        rating: { $gte: 0 }
     }
 
-    if( category && !mongoose.Types.ObjectId.isValid(category)){
+    if (category && !mongoose.Types.ObjectId.isValid(category)) {
         throw new ApiError(StatusCodes.BAD_REQUEST, "Invalid Category ID")
     }
 
-    if(category){
+    if (category) {
         condition['category'] = category;
     }
 
@@ -191,6 +193,68 @@ const recommendedServiceFromDB = async (user: JwtPayload, category: string): Pro
     return services;
 }
 
+const getServiceListFromDB = async (user: JwtPayload, query: Record<string, any>): Promise<IService[]> => {
+    const { minPrice, maxPrice, search, ...othersQuery } = query;
+
+    const anyConditions: Record<string, any>[] = [];
+
+    if (search) {
+
+        const categoriesID = await Category.find({ name: { $regex: search, $options: "i" } }).distinct("_id");
+            const subCategoriesID = await SubCategory.find({ title: { $regex: search, $options: "i" } }).distinct("_id");
+
+            anyConditions.push({
+                $or: [
+                    { title: { $in: subCategoriesID } },
+                    { category: { $in: categoriesID } }
+                ]
+            })
+    }
+
+    if (minPrice && maxPrice) {
+        anyConditions.push({ 
+            price : {
+                $gte: parseFloat(minPrice), 
+                $lte: parseFloat(maxPrice)
+            } 
+        });
+    }
+
+    // Additional filters for other fields
+    if (Object.keys(othersQuery).length) {
+        anyConditions.push({
+            $and: Object.entries(othersQuery).map(([field, value]) => ({
+                [field]: value
+            }))
+        });
+    }
+
+    const whereConditions = anyConditions.length > 0 ? { $and: anyConditions } : {};
+    const result = await Service.find(whereConditions).select("rating discount totalRating barber image")
+        .populate([
+            {
+                path: "barber",
+                select: "name"
+            },
+            {
+                path: "category",
+                select: "name"
+            },
+            {
+                path: "title",
+                select: "title"
+            }
+        ])
+        .lean();
+    
+    const services = await Promise.all(result.map(async (service: any) => {
+        const isFavorite = await Bookmark.findOne({ service: service._id, barber: service.barber, customer: user.id });
+        return { ...service, isBookmarked: !!isFavorite };
+    }));
+    
+    return services;
+}
+
 
 export const ServiceService = {
     createServiceToDB,
@@ -198,5 +262,6 @@ export const ServiceService = {
     getServiceForBarberFromDB,
     holdServiceFromDB,
     specialOfferServiceFromDB,
-    recommendedServiceFromDB
+    recommendedServiceFromDB,
+    getServiceListFromDB
 }

@@ -53,6 +53,11 @@ router.get("/recommended",
     ServiceController.recommendedService
 );
 
+router.get("/list",
+    auth(USER_ROLES.CUSTOMER),
+    ServiceController.getServiceList
+);
+
 router
     .route("/:id")
     .patch(

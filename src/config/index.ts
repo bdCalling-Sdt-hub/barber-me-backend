@@ -16,7 +16,7 @@ export default{
     },
     stripe:{
         stripeSecretKey:process.env.STRIPE_API_SECRET,
-        webhookSecret:process.env.WEBHOOK_SECRET
+        webhookSecret:process.env.STRIPE_WEBHOOK_SECRET
     },
     email:{
         from: process.env.EMAIL_FROM,
@@ -33,5 +33,6 @@ export default{
         accountSid: process.env.TWILIO_ACCOUNT_SID,
         authToken: process.env.TWILIO_AUTH_TOKEN,
         twilioNumber: process.env.TWILIO_NUMBER
-    }
+    },
+    google_maps: process.env.GOOGLE_MAPS_API_KEY
 }

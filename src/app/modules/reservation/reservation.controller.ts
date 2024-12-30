@@ -67,11 +67,24 @@ const respondedReservation = catchAsync(async (req: Request, res: Response) => {
     })
 }); 
 
+
+const cancelReservation = catchAsync(async (req: Request, res: Response) => {
+
+    const reservation = await ReservationService.cancelReservationFromDB(req.params.id);
+    sendResponse(res, {
+        statusCode: StatusCodes.OK,
+        success: true,
+        message: "Reservation Cancelled. You have been refunded within 24 hours",
+        data: reservation
+    })
+}); 
+
 export const ReservationController = {
     createReservation,
     barberReservation,
     customerReservation,
     reservationSummerForBarber,
     reservationDetails,
-    respondedReservation
+    respondedReservation,
+    cancelReservation
 }

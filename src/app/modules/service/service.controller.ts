@@ -70,11 +70,23 @@ const recommendedService = catchAsync(async(req: Request, res: Response)=>{
     })
 })
 
+const getServiceList = catchAsync(async(req: Request, res: Response)=>{
+    const result = await ServiceService.getServiceListFromDB(req.user, req.query);
+
+    sendResponse(res, {
+        statusCode: StatusCodes.OK,
+        success: true,
+        message: "Service List retrieved Successfully",
+        data: result
+    })
+})
+
 export const ServiceController = {
     createService,
     updateService,
     getServiceForBarber,
     holdService,
     specialOfferService,
-    recommendedService
+    recommendedService,
+    getServiceList
 }
