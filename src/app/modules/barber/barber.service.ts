@@ -7,15 +7,19 @@ import { StatusCodes } from "http-status-codes";
 import mongoose from "mongoose";
 import { Reservation } from "../reservation/reservation.model";
 
-const getBarberProfileFromDB = async (user: JwtPayload): Promise<{}> => {
+const getBarberProfileFromDB = async (id: string): Promise<{}> => {
+
+    if(!mongoose.Types.ObjectId.isValid(id)) {
+        throw new ApiError(StatusCodes.BAD_REQUEST, "Invalid Barber ID")
+    }
 
     const [barber, portfolios, reviews, rating] = await Promise.all([
-        User.findById(user.id).select("name email profile about accountInformation address contact gender dateOfBirth").lean(),
-        Portfolio.find({ barber: user.id }).select("image"),
-        Review.find({ barber: user.id }).populate({ path: "barber", select: "name" }).select("barber comment createdAt rating"),
+        User.findById(id).select("name email profile about address contact gender dateOfBirth").lean(),
+        Portfolio.find({ barber: id }).select("image"),
+        Review.find({ barber: id }).populate({ path: "barber", select: "name" }).select("barber comment createdAt rating"),
         Review.aggregate([
             {
-                $match: { barber: user.id }
+                $match: { barber: id }
             },
             {
                 $group: {

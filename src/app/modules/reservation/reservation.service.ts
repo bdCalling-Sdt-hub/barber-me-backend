@@ -39,7 +39,7 @@ const barberReservationFromDB = async (user: JwtPayload, status: string): Promis
         .populate([
             {
                 path: 'customer',
-                select: "name"
+                select: "name location"
             },
             {
                 path: 'service',

@@ -4,8 +4,7 @@ import { USER_ROLES } from '../../../enums/user';
 import { BarberController } from './barber.controller';
 const router = express.Router();
 
-router.get('/',
-    auth(USER_ROLES.BARBER),
+router.get('/customer/:id',
     BarberController.getBarberProfile
 );
 

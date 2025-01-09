@@ -32,7 +32,6 @@ router.route("/")
         CategoryController.createCategory
     )
     .get(
-        auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN, USER_ROLES.CUSTOMER, USER_ROLES.BARBER),
         CategoryController.getCategories
     );
 

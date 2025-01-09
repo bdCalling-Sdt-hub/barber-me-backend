@@ -5,7 +5,7 @@ import sendResponse from "../../../shared/sendResponse";
 import { StatusCodes } from "http-status-codes";
 
 const getBarberProfile = catchAsync(async (req: Request, res: Response)=> {
-    const result = await BarberService.getBarberProfileFromDB(req.user);
+    const result = await BarberService.getBarberProfileFromDB(req.params.id);
 
     sendResponse(res, {
         statusCode: StatusCodes.OK,

@@ -45,6 +45,7 @@ const userSchema = new Schema<IUser, UserModal>(
             },
             coordinates: {
                 type: [Number],
+                default: [-122.084, 37.4219983], // [longitude, latitude]
                 required: false
             }
         },
@@ -94,11 +95,11 @@ const userSchema = new Schema<IUser, UserModal>(
             select: 0
         },
         accountInformation: {
-            status: {type: Boolean},
-            accountId: {type: String},
-            externalAccountId: {type: String},
-            accountUrl: {type: String},
-            currency: {type: String}
+            status: { type: Boolean },
+            accountId: { type: String },
+            externalAccountId: { type: String },
+            accountUrl: { type: String },
+            currency: { type: String }
         }
     },
     {
@@ -141,7 +142,7 @@ userSchema.pre('save', async function (next) {
         throw new ApiError(StatusCodes.BAD_REQUEST, 'Email already exist!');
     }
 
-    if(user.role === USER_ROLES.BARBER){
+    if (user.role === USER_ROLES.BARBER) {
 
         // if role is BARBER the accountInformation status initially set as false
         user.accountInformation = {

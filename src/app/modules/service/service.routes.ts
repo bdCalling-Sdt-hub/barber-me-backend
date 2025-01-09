@@ -44,17 +44,14 @@ router
 
 
 router.get("/special-offer",
-    auth(USER_ROLES.CUSTOMER),
     ServiceController.specialOfferService
 );
     
 router.get("/recommended",
-    auth(USER_ROLES.CUSTOMER),
     ServiceController.recommendedService
 );
 
 router.get("/list",
-    auth(USER_ROLES.CUSTOMER),
     ServiceController.getServiceList
 );
 
