@@ -18,7 +18,7 @@ const toggleBookmark = catchAsync(async(req: Request, res: Response)=>{
 
 const getBookmark = catchAsync(async(req: Request, res: Response)=>{
     const user = req.user;
-    const result = await BookmarkService.getBookmark(user);
+    const result = await BookmarkService.getBookmark(user, req.query);
     sendResponse(res, {
         statusCode: 200,
         success: true,

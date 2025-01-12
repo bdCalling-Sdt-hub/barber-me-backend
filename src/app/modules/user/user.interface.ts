@@ -30,6 +30,7 @@ export type IUser = {
     gender: "Male" | "Female" | "Children" | "Others";
     profile: string;
     verified: boolean;
+    discount?: number;
     authentication?: IAuthenticationProps;
     accountInformation?: IStripeAccountInfo;
 }

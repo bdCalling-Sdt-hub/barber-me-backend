@@ -45,13 +45,13 @@ const userSchema = new Schema<IUser, UserModal>(
             },
             coordinates: {
                 type: [Number],
-                default: [-122.084, 37.4219983], // [longitude, latitude]
+                // default: [-122.084, 37.4219983], // [longitude, latitude]
                 required: false
             }
         },
         profile: {
             type: String,
-            default: 'https://static.vecteezy.com/system/resources/previews/009/292/244/non_2x/default-avatar-icon-of-social-media-user-vector.jpg',
+            default: 'https://res.cloudinary.com/ddqovbzxy/image/upload/v1736572642/avatar_ziy9mp.jpg',
         },
         verified: {
             type: Boolean,
@@ -100,6 +100,9 @@ const userSchema = new Schema<IUser, UserModal>(
             externalAccountId: { type: String },
             accountUrl: { type: String },
             currency: { type: String }
+        },
+        discount: {
+            type: Number
         }
     },
     {
@@ -149,6 +152,7 @@ userSchema.pre('save', async function (next) {
             status: false
         };
 
+        user.discount = 0
         user.about = ''
 
         // if role is BARBER the isSubscribe initially set as false

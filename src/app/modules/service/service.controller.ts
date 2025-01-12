@@ -48,45 +48,9 @@ const holdService = catchAsync(async(req: Request, res: Response)=>{
     })
 })
 
-const specialOfferService = catchAsync(async(req: Request, res: Response)=>{
-    const result = await ServiceService.specialOfferServiceFromDB(req.user, req.query);
-
-    sendResponse(res, {
-        statusCode: StatusCodes.OK,
-        success: true,
-        message: "Special Offer Service retrieved Successfully",
-        data: result
-    })
-})
-
-const recommendedService = catchAsync(async(req: Request, res: Response)=>{
-    const result = await ServiceService.recommendedServiceFromDB(req.user, req.query);
-
-    sendResponse(res, {
-        statusCode: StatusCodes.OK,
-        success: true,
-        message: "Recommended Service retrieved Successfully",
-        data: result
-    })
-})
-
-const getServiceList = catchAsync(async(req: Request, res: Response)=>{
-    const result = await ServiceService.getServiceListFromDB(req.user, req.query);
-
-    sendResponse(res, {
-        statusCode: StatusCodes.OK,
-        success: true,
-        message: "Service List retrieved Successfully",
-        data: result
-    })
-})
-
 export const ServiceController = {
     createService,
     updateService,
     getServiceForBarber,
-    holdService,
-    specialOfferService,
-    recommendedService,
-    getServiceList
+    holdService
 }

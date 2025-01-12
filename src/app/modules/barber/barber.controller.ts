@@ -5,7 +5,7 @@ import sendResponse from "../../../shared/sendResponse";
 import { StatusCodes } from "http-status-codes";
 
 const getBarberProfile = catchAsync(async (req: Request, res: Response)=> {
-    const result = await BarberService.getBarberProfileFromDB(req.params.id);
+    const result = await BarberService.getBarberProfileFromDB(req.params.id, req.query);
 
     sendResponse(res, {
         statusCode: StatusCodes.OK,
@@ -26,7 +26,58 @@ const getCustomerProfile = catchAsync(async (req: Request, res: Response)=> {
     });
 });
 
+const makeDiscount = catchAsync(async (req: Request, res: Response)=> {
+    const result = await BarberService.makeDiscountToDB(req.user, req.body.discount);
+
+    sendResponse(res, {
+        statusCode: StatusCodes.OK,
+        success: true,
+        message: "Discount added successfully",
+        data: result
+    });
+});
+
+const specialOfferBarber = catchAsync(async(req: Request, res: Response)=>{
+    const result = await BarberService.specialOfferBarberFromDB(req.user, req.query);
+
+    sendResponse(res, {
+        statusCode: StatusCodes.OK,
+        success: true,
+        message: "Special Offer Barber data retrieved Successfully",
+        data: result
+    })
+})
+
+const recommendedBarber = catchAsync(async(req: Request, res: Response)=>{
+    const result = await BarberService.recommendedBarberFromDB(req.user, req.query);
+
+    sendResponse(res, {
+        statusCode: StatusCodes.OK,
+        success: true,
+        message: "Recommended Barber data retrieved Successfully",
+        data: result
+    })
+});
+
+
+const getBarberList = catchAsync(async(req: Request, res: Response)=>{
+    const result = await BarberService.getBarberListFromDB(req.user, req.query);
+
+    sendResponse(res, {
+        statusCode: StatusCodes.OK,
+        success: true,
+        message: "Recommended Barber data retrieved Successfully",
+        data: result
+    })
+});
+
+
+
 export const BarberController = {
     getBarberProfile,
-    getCustomerProfile
+    getCustomerProfile,
+    makeDiscount,
+    specialOfferBarber,
+    recommendedBarber,
+    getBarberList
 }

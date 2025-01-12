@@ -4,15 +4,15 @@ import { IBookmark } from "./bookmark.interface";
 import { Bookmark } from "./bookmark.model";
 import { JwtPayload } from "jsonwebtoken";
 import mongoose from "mongoose";
+import getDistanceFromCoordinates from "../../../shared/getDistanceFromCoordinates";
+import { Review } from "../review/review.model";
+import getBarberCategory from "../../../shared/getCategoryForBarber";
+import getRatingForBarber from "../../../shared/getRatingForBarber";
 
-const toggleBookmark = async (payload: { customer: string, barber: string, service: string }): Promise<string> => {
+const toggleBookmark = async (payload: { customer: string, barber: string }): Promise<string> => {
 
     if (!mongoose.Types.ObjectId.isValid(payload.barber)) {
         throw new ApiError(StatusCodes.NOT_ACCEPTABLE, "Invalid Barber ID")
-    }
-
-    if (!mongoose.Types.ObjectId.isValid(payload.service)) {
-        throw new ApiError(StatusCodes.NOT_ACCEPTABLE, "Invalid Service ID")
     }
 
     // Check if the bookmark already exists
@@ -34,16 +34,39 @@ const toggleBookmark = async (payload: { customer: string, barber: string, servi
 };
 
 
-const getBookmark = async (user: JwtPayload): Promise<IBookmark[]> => {
+const getBookmark = async (user: JwtPayload, query: Record<string, any>): Promise<IBookmark[]> => {
 
-    const result: any = await Bookmark.find({ customer: user?.id })
-        .populate({
-            path: 'barber',
-            model: 'User'
-        }).select("barber")
+    const { coordinates } = query;
 
+    if (!coordinates) {
+        throw new ApiError(StatusCodes.BAD_REQUEST, "Please Provide coordinates")
+    }
 
-    return result;
+    const barbers = await Bookmark.find({ customer: user?.id })
+        .populate([
+            {
+                path: "barber",
+                select: "name location discount image"
+            },
+        ])
+        .select("barber")
+        .lean();
+
+    const barbersWithDistance = await Promise.all(barbers.map(async (barber: any) => {
+        const distance = await getDistanceFromCoordinates(barber?.barber?.location?.coordinates, JSON?.parse(coordinates));
+        const rating = await getRatingForBarber(barber?.barber?._id);
+        const service = await getBarberCategory(barber?.barber?._id);
+
+        return {
+            ...barber,
+            services: service || [],
+            rating: rating,
+            distance: distance ? distance : null,
+            isBookmarked: true
+        };
+    }));
+
+    return barbersWithDistance;
 }
 
 export const BookmarkService = { toggleBookmark, getBookmark }

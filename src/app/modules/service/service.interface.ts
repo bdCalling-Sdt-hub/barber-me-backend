@@ -2,6 +2,7 @@ import { Model, Types } from "mongoose";
 
 
 export type IService = {
+    barber: Types.ObjectId;
     title: Types.ObjectId;
     category: Types.ObjectId;
     image: String;
@@ -10,7 +11,6 @@ export type IService = {
     duration: String;
     description: String;
     gender: "Male" | "Female" | "Children" | "Others";
-    barber: Types.ObjectId;
     isOffered: Boolean;
     rating: Number;
     status: "Active" | "Inactive";

@@ -16,7 +16,7 @@ router
             try {
 
                 const payload = req.body;
-                const result = payload?.map((service:any) =>{
+                const result = payload?.map((service: any) => {
                     return {
                         ...service,
                         barber: req.user.id
@@ -30,7 +30,7 @@ router
                 return res.status(500).json({ message: "Need Array to insert Multiple Service together" });
             }
         },
-        validateRequest(ServiceValidation.createServiceZodSchema), 
+        validateRequest(ServiceValidation.createServiceZodSchema),
         ServiceController.createService
     )
     .get(
@@ -41,19 +41,6 @@ router
         auth(USER_ROLES.BARBER),
         ServiceController.holdService
     );
-
-
-router.get("/special-offer",
-    ServiceController.specialOfferService
-);
-    
-router.get("/recommended",
-    ServiceController.recommendedService
-);
-
-router.get("/list",
-    ServiceController.getServiceList
-);
 
 router
     .route("/:id")
@@ -69,7 +56,7 @@ router
                     image = `/images/${req.files.image[0].filename}`;
                 }
 
-                if(price && discount){
+                if (price && discount) {
                     othersPayload.price = Number(price);
                     othersPayload.discount = Number(discount);
                 }
@@ -81,7 +68,7 @@ router
                 return res.status(500).json({ message: "Invalid Image Format" });
             }
         },
-        validateRequest(ServiceValidation.updateServiceZodSchema), 
+        validateRequest(ServiceValidation.updateServiceZodSchema),
         ServiceController.updateService
     )
 

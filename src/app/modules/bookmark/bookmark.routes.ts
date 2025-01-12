@@ -5,7 +5,14 @@ import { USER_ROLES } from "../../../enums/user";
 
 const router = express.Router();
 
-router.get("/", auth(USER_ROLES.CUSTOMER), BookmarkController.getBookmark);
-router.post("/", auth(USER_ROLES.CUSTOMER), BookmarkController.toggleBookmark);
+router.route("/")
+    .post(
+        auth(USER_ROLES.CUSTOMER),
+        BookmarkController.toggleBookmark
+    )
+    .get(
+        auth(USER_ROLES.CUSTOMER),
+        BookmarkController.getBookmark
+    );
 
 export const BookmarkRoutes = router;
