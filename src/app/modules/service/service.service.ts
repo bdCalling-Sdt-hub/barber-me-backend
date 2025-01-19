@@ -5,10 +5,6 @@ import { Service } from "./service.model";
 import mongoose, { UpdateWriteOpResult } from "mongoose";
 import { JwtPayload } from "jsonwebtoken";
 import unlinkFile from "../../../shared/unlinkFile";
-import { Bookmark } from "../bookmark/bookmark.model";
-import { Category } from "../category/category.model";
-import { SubCategory } from "../subCategory/subCategory.model";
-import getDistanceFromCoordinates from "../../../shared/getDistanceFromCoordinates";
 
 const createServiceToDB = async (payload: IService[]): Promise<IService[] | null> => {
 
@@ -87,8 +83,15 @@ const updateServiceToDB = async (id: string, payload: IService): Promise<IServic
 
 
 const getServiceForBarberFromDB = async (user: JwtPayload, category: string): Promise<IService[]> => {
+
+    if (category && !mongoose.Types.ObjectId.isValid(category)) {
+        throw new ApiError(StatusCodes.BAD_REQUEST, "Invalid Category ID")
+    }
+
     const result = await Service.find({ barber: user.id, category: category })
-        .select("title duration price image");
+        .select("title duration price image")
+        .populate("title", "title")
+        .lean();
     return result;
 }
 
