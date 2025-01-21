@@ -15,12 +15,13 @@ const createReservation = catchAsync(async (req: Request, res: Response) => {
 }); 
 
 const barberReservation = catchAsync(async (req: Request, res: Response) => {
-    const reservation = await ReservationService.barberReservationFromDB(req.user, req.query.status as string);
+    const result = await ReservationService.barberReservationFromDB(req.user, req.query);
     sendResponse(res, {
         statusCode: StatusCodes.OK,
         success: true,
         message: "Reservation created successfully",
-        data: reservation
+        data: result.data,
+        pagination: result.meta
     })
 }); 
 

@@ -17,6 +17,11 @@ router.post('/discount',
     BarberController.makeDiscount
 );
 
+router.get('/profile',
+    auth(USER_ROLES.BARBER),
+    BarberController.barberDetails
+);
+
 router.get('/offer',
     BarberController.specialOfferBarber
 );

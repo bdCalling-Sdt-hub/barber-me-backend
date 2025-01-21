@@ -11,7 +11,7 @@ const createReservationToDB = async (payload: IReservation): Promise<IReservatio
     const reservation = await Reservation.create(payload);
     if (!reservation) {
         throw new Error('Failed to created Reservation ');
-    } else{
+    } else {
         const data = {
             text: "Your reservation has been rejected. Try another Barber",
             receiver: payload.barber,
@@ -25,7 +25,8 @@ const createReservationToDB = async (payload: IReservation): Promise<IReservatio
     return reservation;
 };
 
-const barberReservationFromDB = async (user: JwtPayload, status: string): Promise<{}> => {
+const barberReservationFromDB = async (user: JwtPayload, query: Record<string, any>): Promise<any> => {
+    const { page, limit, status } = query;
 
     const condition: any = {
         barber: user.id
@@ -35,7 +36,11 @@ const barberReservationFromDB = async (user: JwtPayload, status: string): Promis
         condition['status'] = status;
     }
 
-    const reservation = await Reservation.find(condition)
+    const pages = parseInt(page as string) || 1;
+    const size = parseInt(limit as string) || 10;
+    const skip = (pages - 1) * size;
+
+    const reservations = await Reservation.find(condition)
         .populate([
             {
                 path: 'customer',
@@ -56,7 +61,11 @@ const barberReservationFromDB = async (user: JwtPayload, status: string): Promis
                 ]
             }
         ])
-        .select("customer service createdAt status price");
+        .select("customer service createdAt status price")
+        .skip(skip)
+        .limit(size);
+
+    const count = await Reservation.countDocuments(condition);
 
     // check how many reservation in each status
     const allStatus = await Promise.all(["Upcoming", "Accepted", "Canceled", "Completed"].map(
@@ -65,10 +74,22 @@ const barberReservationFromDB = async (user: JwtPayload, status: string): Promis
                 status,
                 count: await Reservation.countDocuments({ barber: user.id, status })
             }
-        }));
+        })
+    );
+
+    const data = {
+        reservations,
+        allStatus
+    }
+    const meta = {
+        page: pages,
+        totalPage: Math.ceil(count / size),
+        total: count,
+        limit: size
+    }
 
 
-    return { allStatus, reservation };
+    return { data, meta };
 }
 
 const customerReservationFromDB = async (user: JwtPayload, status: string): Promise<IReservation[]> => {
@@ -231,7 +252,7 @@ const respondedReservationFromDB = async (id: string, status: string): Promise<I
 
         sendNotifications(data);
     }
-    
+
     return updatedReservation;
 }
 
@@ -246,9 +267,9 @@ const cancelReservationFromDB = async (id: string): Promise<IReservation | null>
         { new: true }
     );
 
-    if(!updatedReservation) {
+    if (!updatedReservation) {
         throw new ApiError(StatusCodes.NOT_FOUND, 'Failed to update reservation');
-    }else{
+    } else {
         const data = {
             text: "A customer has requested to cancel your reservation",
             receiver: updatedReservation.barber,

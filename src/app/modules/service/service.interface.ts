@@ -7,7 +7,6 @@ export type IService = {
     category: Types.ObjectId;
     image: String;
     price: Number;
-    discount?: Number;
     duration: String;
     description: String;
     gender: "Male" | "Female" | "Children" | "Others";

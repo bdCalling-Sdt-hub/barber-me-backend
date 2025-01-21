@@ -49,16 +49,15 @@ router
         fileUploadHandler(),
         async (req: Request, res: Response, next: NextFunction) => {
             try {
-                const { price, discount, ...othersPayload } = req.body;
+                const { price, ...othersPayload } = req.body;
 
                 let image;
                 if (req.files && "image" in req.files && req.files.image[0]) {
                     image = `/images/${req.files.image[0].filename}`;
                 }
 
-                if (price && discount) {
+                if (price) {
                     othersPayload.price = Number(price);
-                    othersPayload.discount = Number(discount);
                 }
 
                 req.body = { ...othersPayload, image };

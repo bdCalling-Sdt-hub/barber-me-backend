@@ -24,10 +24,6 @@ const serviceSchema = new Schema<IService, ServiceModel>(
             type: Number,
             required: false
         },
-        discount: {
-            type: Number,
-            required: false
-        },
         duration: {
             type: String,
             required: false

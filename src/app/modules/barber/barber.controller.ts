@@ -72,6 +72,17 @@ const getBarberList = catchAsync(async(req: Request, res: Response)=>{
 });
 
 
+const barberDetails = catchAsync(async(req: Request, res: Response)=>{
+    const result = await BarberService.barberDetailsFromDB(req.user);
+
+    sendResponse(res, {
+        statusCode: StatusCodes.OK,
+        success: true,
+        message: "Recommended Barber data retrieved Successfully",
+        data: result
+    })
+});
+
 
 export const BarberController = {
     getBarberProfile,
@@ -79,5 +90,6 @@ export const BarberController = {
     makeDiscount,
     specialOfferBarber,
     recommendedBarber,
-    getBarberList
+    getBarberList,
+    barberDetails
 }

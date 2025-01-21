@@ -3,6 +3,7 @@ import auth from '../../middlewares/auth';
 import { USER_ROLES } from '../../../enums/user';
 import { PortfolioController } from './portfolio.controller';
 import fileUploadHandler from '../../middlewares/fileUploaderHandler';
+import { getMultipleFilesPath } from '../../../shared/getFilePath';
 const router = express.Router();
 
 router
@@ -13,12 +14,15 @@ router
         async (req: Request, res: Response, next: NextFunction) => {
             try {
 
-                let image;
-                if (req.files && "image" in req.files && req.files.image[0]) {
-                    image = `/images/${req.files.image[0].filename}`;
-                }
+                const images = getMultipleFilesPath(req.files, "image");
+                const result = images?.map((image: string) => {
+                    return {
+                        image: image,
+                        barber: req.user.id
+                    }
+                });
 
-                req.body = { image, barber: req.user.id };
+                req.body = result;
                 next();
 
             } catch (error) {

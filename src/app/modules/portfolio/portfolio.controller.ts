@@ -4,8 +4,8 @@ import sendResponse from '../../../shared/sendResponse';
 import { PortfolioService } from './portfolio.service';
 
 const createPortfolio = catchAsync(async (req: Request, res: Response) => {
-    const payload = req.body;
-    const result = await PortfolioService.createPortfolioToDB(payload);
+
+    const result = await PortfolioService.createPortfolioToDB(req.body);
   
     sendResponse(res, {
         statusCode: 200,

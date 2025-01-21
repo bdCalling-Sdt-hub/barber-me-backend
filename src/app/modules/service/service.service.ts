@@ -89,7 +89,6 @@ const getServiceForBarberFromDB = async (user: JwtPayload, category: string): Pr
     }
 
     const result = await Service.find({ barber: user.id, category: category })
-        .select("title duration price image")
         .populate("title", "title")
         .lean();
     return result;

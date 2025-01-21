@@ -5,12 +5,12 @@ import { IPortfolio } from './portfolio.interface';
 import { Portfolio } from './portfolio.model';
 
 
-const createPortfolioToDB = async (payload: IPortfolio): Promise<IPortfolio> => {
-  const faq = await Portfolio.create(payload);
-  if (!faq) {
+const createPortfolioToDB = async (payload: IPortfolio): Promise<IPortfolio[]> => {
+  const portfolios = await Portfolio.insertMany(payload);
+  if (!portfolios) {
     throw new ApiError(StatusCodes.BAD_REQUEST, 'Failed to created Faq');
   }
-  return faq;
+  return portfolios;
 };
 
 const portfolioFromDB = async (): Promise<IPortfolio[]> => {
