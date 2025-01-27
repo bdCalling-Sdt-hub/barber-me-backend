@@ -26,7 +26,7 @@ const barberReservation = catchAsync(async (req: Request, res: Response) => {
 }); 
 
 const customerReservation = catchAsync(async (req: Request, res: Response) => {
-    const reservation = await ReservationService.customerReservationFromDB(req.user, req.query.status as string);
+    const reservation = await ReservationService.customerReservationFromDB(req.user, req.query);
     sendResponse(res, {
         statusCode: StatusCodes.OK,
         success: true,
@@ -80,6 +80,18 @@ const cancelReservation = catchAsync(async (req: Request, res: Response) => {
     })
 }); 
 
+
+const confirmReservation = catchAsync(async (req: Request, res: Response) => {
+
+    const reservation = await ReservationService.confirmReservationFromDB(req.params.id);
+    sendResponse(res, {
+        statusCode: StatusCodes.OK,
+        success: true,
+        message: "Reservation Confirm",
+        data: reservation
+    })
+}); 
+
 export const ReservationController = {
     createReservation,
     barberReservation,
@@ -87,5 +99,6 @@ export const ReservationController = {
     reservationSummerForBarber,
     reservationDetails,
     respondedReservation,
-    cancelReservation
+    cancelReservation,
+    confirmReservation
 }

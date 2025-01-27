@@ -5,6 +5,7 @@ import { Service } from "./service.model";
 import mongoose, { UpdateWriteOpResult } from "mongoose";
 import { JwtPayload } from "jsonwebtoken";
 import unlinkFile from "../../../shared/unlinkFile";
+import { User } from "../user/user.model";
 
 const createServiceToDB = async (payload: IService[]): Promise<IService[] | null> => {
 
@@ -95,7 +96,18 @@ const getServiceForBarberFromDB = async (user: JwtPayload, category: string): Pr
 }
 
 // hold service
-const holdServiceFromDB = async (user: JwtPayload): Promise<UpdateWriteOpResult> => {
+const holdServiceFromDB = async (user: JwtPayload, password: string): Promise<UpdateWriteOpResult> => {
+
+
+    const isExistUser = await User.findById(user.id).select('+password');
+    if (!isExistUser) {
+        throw new ApiError(StatusCodes.BAD_REQUEST, "User doesn't exist!");
+    }
+
+    //check match password
+    if (password && !(await User.isMatchPassword(password, isExistUser.password))) {
+        throw new ApiError(StatusCodes.BAD_REQUEST, 'Password is incorrect');
+    }
 
     const result = await Service.updateMany(
         { barber: user.id },

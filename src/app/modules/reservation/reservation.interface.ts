@@ -4,13 +4,14 @@ export type IReservation = {
     barber: Types.ObjectId;
     customer: Types.ObjectId;
     service: Types.ObjectId;
-    status: "Upcoming" | "Accepted" | "Rejected" | "Canceled" | "Completed";
+    status: "Upcoming" | "Accepted" | "Canceled" | "Completed";
     paymentStatus: "Pending" | "Paid" | "Refunded";
     price: number;
     txid: string;
     cancelByCustomer: boolean;
     isReported: boolean;
     sessionId?: string;
+    tips?: number;
     transfer?: boolean;
 }
 

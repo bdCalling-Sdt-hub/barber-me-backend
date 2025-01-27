@@ -17,7 +17,6 @@ import { PortfolioRoutes } from '../modules/portfolio/portfolio.route';
 import { BarberRoutes } from '../modules/barber/barber.routes';
 import { ReservationRoutes } from '../modules/reservation/reservation.routes';
 import { ReportRoutes } from '../modules/report/report.routes';
-import { CustomerRoutes } from '../modules/customer/customer.routes';
 import { PaymentRoutes } from '../modules/payment/payment.routes';
 const router = express.Router();
 
@@ -38,7 +37,6 @@ const apiRoutes = [
     { path: "/service", route: ServiceRoutes },
     { path: "/portfolio", route: PortfolioRoutes },
     { path: "/barber", route: BarberRoutes },
-    { path: "/customer", route: CustomerRoutes },
     { path: "/reservation", route: ReservationRoutes },
     { path: "/report", route: ReportRoutes },
     { path: "/payment", route: PaymentRoutes },

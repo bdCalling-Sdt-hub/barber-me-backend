@@ -6,6 +6,9 @@ import ApiError from "../../../errors/ApiError";
 import { Report } from "../report/report.model";
 import mongoose from "mongoose";
 import { sendNotifications } from "../../../helpers/notificationsHelper";
+import getDistanceFromCoordinates from "../../../shared/getDistanceFromCoordinates";
+import getRatingForBarber from "../../../shared/getRatingForBarber";
+import { Review } from "../review/review.model";
 
 const createReservationToDB = async (payload: IReservation): Promise<IReservation> => {
     const reservation = await Reservation.create(payload);
@@ -26,7 +29,11 @@ const createReservationToDB = async (payload: IReservation): Promise<IReservatio
 };
 
 const barberReservationFromDB = async (user: JwtPayload, query: Record<string, any>): Promise<any> => {
-    const { page, limit, status } = query;
+    const { page, limit, status, coordinates } = query;
+
+    if (!coordinates) {
+        throw new ApiError(StatusCodes.BAD_REQUEST, "Please Provide coordinates")
+    }
 
     const condition: any = {
         barber: user.id
@@ -44,7 +51,7 @@ const barberReservationFromDB = async (user: JwtPayload, query: Record<string, a
         .populate([
             {
                 path: 'customer',
-                select: "name location"
+                select: "name location profile address"
             },
             {
                 path: 'service',
@@ -61,9 +68,10 @@ const barberReservationFromDB = async (user: JwtPayload, query: Record<string, a
                 ]
             }
         ])
-        .select("customer service createdAt status price")
+        .select("customer service createdAt status tips paymentStatus cancelByCustomer price")
         .skip(skip)
-        .limit(size);
+        .limit(size)
+        .lean();
 
     const count = await Reservation.countDocuments(condition);
 
@@ -77,8 +85,21 @@ const barberReservationFromDB = async (user: JwtPayload, query: Record<string, a
         })
     );
 
+    const reservationsWithDistance = await Promise.all(reservations.map(async (reservation: any) => {
+        const distance = await getDistanceFromCoordinates(reservation?.customer?.location?.coordinates, JSON?.parse(coordinates));
+        const report = await Report.findOne({reservation: reservation?._id});
+
+        const rating = await Review.findOne({ customer: reservation?.customer?._id,  service: reservation?.service?._id }).select("rating").lean();
+        return {
+            ...reservation,
+            report: report || {},
+            rating: rating || {},
+            distance: distance ? distance : {}
+        };
+    }));
+
     const data = {
-        reservations,
+        reservations: reservationsWithDistance,
         allStatus
     }
     const meta = {
@@ -92,7 +113,12 @@ const barberReservationFromDB = async (user: JwtPayload, query: Record<string, a
     return { data, meta };
 }
 
-const customerReservationFromDB = async (user: JwtPayload, status: string): Promise<IReservation[]> => {
+const customerReservationFromDB = async (user: JwtPayload, query: Record<string, any>): Promise<{}> => {
+    const { page, limit, status, coordinates } = query;
+
+    if (!coordinates) {
+        throw new ApiError(StatusCodes.BAD_REQUEST, "Please Provide coordinates")
+    }
 
     const condition: any = {
         customer: user.id
@@ -102,15 +128,19 @@ const customerReservationFromDB = async (user: JwtPayload, status: string): Prom
         condition['status'] = status;
     }
 
-    const reservation = await Reservation.find(condition)
+    const pages = parseInt(page as string) || 1;
+    const size = parseInt(limit as string) || 10;
+    const skip = (pages - 1) * size;
+
+    const reservations:any = await Reservation.find(condition)
         .populate([
             {
                 path: 'barber',
-                select: "name"
+                select: "name location profile discount"
             },
             {
                 path: 'service',
-                select: "title category rating totalRating",
+                select: "title category",
                 populate: [
                     {
                         path: "title",
@@ -123,11 +153,33 @@ const customerReservationFromDB = async (user: JwtPayload, status: string): Prom
                 ]
             }
         ])
-        .select("barber service createdAt status price");
+        .select("barber service createdAt status tips price paymentStatus cancelByCustomer")
+        .skip(skip)
+        .limit(size)
+        .lean();
+
+        const reservationsWithDistance = await Promise.all(reservations.map(async (reservation: any) => {
+            const distance = await getDistanceFromCoordinates(reservation?.barber?.location?.coordinates, JSON?.parse(coordinates));
+            const rating = await getRatingForBarber(reservation?.barber?._id);
+            const review = await Review.findOne({ service : reservation?.service?._id, customer: user.id }).select("rating").lean();
+            return {
+                ...reservation,
+                rating: rating,
+                review: review || {},
+                distance: distance ? distance : {}
+            };
+        }));
+
+    const count = await Reservation.countDocuments(condition);
+    const meta = {
+        page: pages,
+        totalPage: Math.ceil(count / size),
+        total: count,
+        limit: size
+    }
 
 
-    if (!reservation) throw [];
-    return reservation;
+    return { reservations: reservationsWithDistance, meta };
 }
 
 const reservationSummerForBarberFromDB = async (user: JwtPayload): Promise<{}> => {
@@ -220,17 +272,6 @@ const respondedReservationFromDB = async (id: string, status: string): Promise<I
     );
     if (!updatedReservation) throw new ApiError(StatusCodes.NOT_FOUND, 'Failed to update reservation');
 
-    if (updatedReservation?.status === "Rejected") {
-        const data = {
-            text: "Your reservation has been rejected. Try another Barber",
-            receiver: updatedReservation.customer,
-            referenceId: id,
-            screen: "RESERVATION"
-        }
-
-        sendNotifications(data);
-    }
-
     if (updatedReservation?.status === "Accepted") {
         const data = {
             text: "Your reservation has been Accepted. Your service will start soon",
@@ -283,6 +324,30 @@ const cancelReservationFromDB = async (id: string): Promise<IReservation | null>
 }
 
 
+const confirmReservationFromDB = async (id: string): Promise<IReservation | null> => {
+
+    if (!mongoose.Types.ObjectId.isValid(id)) throw new ApiError(StatusCodes.BAD_REQUEST, 'Invalid Reservation ID');
+
+    const updatedReservation:any = await Reservation.findOneAndUpdate(
+        { _id: id },
+        { status: "Completed" },
+        { new: true }
+    );
+
+    if (updatedReservation) {
+        const data = {
+            text: "A customer has confirm your reservation",
+            receiver: updatedReservation.barber,
+            referenceId: id,
+            screen: "RESERVATION"
+        }
+        sendNotifications(data);
+    }
+
+    return updatedReservation;
+}
+
+
 export const ReservationService = {
     createReservationToDB,
     barberReservationFromDB,
@@ -290,5 +355,6 @@ export const ReservationService = {
     reservationSummerForBarberFromDB,
     reservationDetailsFromDB,
     respondedReservationFromDB,
-    cancelReservationFromDB
+    cancelReservationFromDB,
+    confirmReservationFromDB
 }

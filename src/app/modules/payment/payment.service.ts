@@ -10,7 +10,7 @@ import mongoose from "mongoose";
 import { sendNotifications } from "../../../helpers/notificationsHelper";
 
 const createPaymentCheckoutToStripe = async (user: JwtPayload, payload: any): Promise<string | null> => {
-    const { price, service_name, id } = payload;
+    const { price, service_name, id, tips } = payload;
 
     if (!service_name) {
         throw new ApiError(StatusCodes.BAD_REQUEST, "Service name is required");
@@ -18,10 +18,6 @@ const createPaymentCheckoutToStripe = async (user: JwtPayload, payload: any): Pr
     
     if (!id) {
         throw new ApiError(StatusCodes.BAD_REQUEST, "Reservation ID is required");
-    }
-
-    if (typeof price !== "number" || price <= 0) {
-        throw new ApiError(StatusCodes.BAD_REQUEST, "Invalid price amount");
     }
 
     // Create a checkout session
@@ -35,14 +31,14 @@ const createPaymentCheckoutToStripe = async (user: JwtPayload, payload: any): Pr
                     product_data: {
                         name: `${service_name} Service Reservation Payment`,
                     },
-                    unit_amount: Math.trunc(price * 100),
+                    unit_amount: price ? Math.trunc(price * 100) : Math.trunc(tips * 100),
                 },
                 quantity: 1,
             },
         ],
         customer_email: user?.email,
-        success_url: "http://192.168.10.102:6001/api/v1/success",
-        cancel_url: "http://192.168.10.102:6001/api/v1/errors"
+        success_url: "http://10.0.80.75:6001/success",
+        cancel_url: "http://10.0.80.75:6001/errors"
     });
 
     if (!session) {
@@ -50,7 +46,10 @@ const createPaymentCheckoutToStripe = async (user: JwtPayload, payload: any): Pr
     }else{
         await Reservation.findOneAndUpdate(
             { _id: id },
-            { sessionId: session.id },
+            { 
+                sessionId: session.id,
+                tips: tips ? Number(tips) : 0 
+            },
             { new: true }
         );
     }

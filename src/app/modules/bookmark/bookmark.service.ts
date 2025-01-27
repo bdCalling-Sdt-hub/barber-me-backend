@@ -46,7 +46,7 @@ const getBookmark = async (user: JwtPayload, query: Record<string, any>): Promis
         .populate([
             {
                 path: "barber",
-                select: "name location discount image"
+                select: "name location discount profile"
             },
         ])
         .select("barber")
@@ -61,7 +61,7 @@ const getBookmark = async (user: JwtPayload, query: Record<string, any>): Promis
             ...barber,
             services: service || [],
             rating: rating,
-            distance: distance ? distance : null,
+            distance: distance ? distance : {},
             isBookmarked: true
         };
     }));

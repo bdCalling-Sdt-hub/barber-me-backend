@@ -8,6 +8,8 @@ import generateOTP from "../../../util/generateOTP";
 import { emailTemplate } from "../../../shared/emailTemplate";
 import { emailHelper } from "../../../helpers/emailHelper";
 import unlinkFile from "../../../shared/unlinkFile";
+import { Reservation } from "../reservation/reservation.model";
+import { Service } from "../service/service.model";
 
 const createAdminToDB = async (payload: any): Promise<IUser> => {
 
@@ -62,11 +64,39 @@ const createUserToDB = async (payload: Partial<IUser>): Promise<IUser> => {
 
 const getUserProfileFromDB = async (user: JwtPayload): Promise<Partial<IUser>> => {
     const { id } = user;
-    const isExistUser: any = await User.isExistUserById(id);
+    const isExistUser: any = await User.findById(id).lean();
     if (!isExistUser) {
         throw new ApiError(StatusCodes.BAD_REQUEST, "User doesn't exist!");
     }
-    return isExistUser;
+
+    const holderStatus = await Service.findOne({barber: user.id, status: "Inactive"});
+
+    const totalServiceCount = await Reservation.countDocuments({ customer: user.id, status: "Completed", paymentStatus: "Paid" });
+
+    const totalSpend = await Reservation.aggregate([
+        {
+            $match: {
+                customer: user.id,
+                status: "Completed",
+                paymentStatus: "Paid"
+            }
+        },
+        {
+            $group: {
+                _id: null,
+                totalSpend: { $sum: "$price" }
+            }
+        }
+    ]);
+
+    const data = {
+        ...isExistUser,
+        totalServiceCount,
+        hold: !!holderStatus,
+        totalSpend: totalSpend[0]?.totalSpend || 0
+    }
+
+    return data;
 };
 
 const updateProfileToDB = async (user: JwtPayload, payload: Partial<IUser>): Promise<Partial<IUser | null>> => {

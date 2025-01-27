@@ -39,6 +39,11 @@ router.get("/barber-summery",
     ReservationController.reservationSummerForBarber
 );
 
+router.patch("/confirm/:id",
+    auth(USER_ROLES.CUSTOMER),
+    ReservationController.confirmReservation
+)
+
 router.route("/:id")
     .get(
         auth(USER_ROLES.BARBER),

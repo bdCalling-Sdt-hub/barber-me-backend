@@ -16,7 +16,13 @@ const messageSchema = new Schema<IMessage, MessageModel>(
         text: { 
             type: String,
             required: false 
-        }
+        },
+        type: {
+            type: String,
+            enum: ['text', 'image', 'both'],
+            default: "text"
+        },
+        images: {}
     },
     {
         timestamps: true

@@ -21,7 +21,7 @@ const ReservationSchema = new Schema<IReservation, ReservationModel>(
         },
         status: {
             type: String,
-            enum: ["Upcoming", "Accepted", "Rejected", "Canceled", "Completed"],
+            enum: ["Upcoming", "Accepted", "Canceled", "Completed"],
             default: "Upcoming",
             required: true
         },
@@ -34,13 +34,16 @@ const ReservationSchema = new Schema<IReservation, ReservationModel>(
             type: Number,
             required: true
         },
+        tips: {
+            type: Number,
+            default: 0
+        },
         txid: {
             type: String,
-            unique: true,
-            index: true
+            unique: true
         },
         cancelByCustomer: {
-            type: Boolean,
+            type: Boolean, 
             default: false
         },
         isReported: {

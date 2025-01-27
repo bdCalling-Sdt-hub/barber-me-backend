@@ -15,7 +15,7 @@ import getRatingForBarber from "../../../shared/getRatingForBarber";
 import { Category } from "../category/category.model";
 import { SubCategory } from "../subCategory/subCategory.model";
 
-const getBarberProfileFromDB = async (id: string, query: Record<string, any>): Promise<{}> => {
+const getBarberProfileFromDB = async (user: JwtPayload, id: string, query: Record<string, any>): Promise<{}> => {
 
     const { coordinates } = query;
 
@@ -51,7 +51,7 @@ const getBarberProfileFromDB = async (id: string, query: Record<string, any>): P
                 }
             }
         ]),
-        Service.find({ barber: id }).populate("title", "title").select("title duration title category price image")
+        Service.find({ barber: id }).populate("title", "title").select("title duration category price image")
     ]);
 
     if (!barber) {
@@ -59,14 +59,16 @@ const getBarberProfileFromDB = async (id: string, query: Record<string, any>): P
     }
 
     const distance = await getDistanceFromCoordinates(barber?.location?.coordinates, JSON?.parse(coordinates));
+    const isBookmarked = await Bookmark.findOne({ customer: user?.id, barber: id });
 
     const result = {
         ...barber,
-        distance: distance ? distance : null,
+        distance: distance ? distance : {},
         rating: {
             totalRatingCount: rating[0]?.totalRatingCount || 0,
             averageRating: rating[0]?.averageRating || 0
         },
+        isBookmarked: !!isBookmarked,
         satisfiedClients: rating[0]?.totalRatingCount || 0,
         portfolios,
         reviews,
@@ -186,7 +188,7 @@ const specialOfferBarberFromDB = async (user: JwtPayload, query: Record<string, 
         const services = await getBarberCategory(barber?._id);
         return {
             ...barber,
-            distance: distance ? distance : null,
+            distance: distance ? distance : {},
             rating,
             services: services || [],
             isBookmarked: !!isFavorite
@@ -262,7 +264,7 @@ const recommendedBarberFromDB = async (user: JwtPayload, query: Record<string, a
         const services = await getBarberCategory(barber?._id);
         return {
             ...barber,
-            distance: distance ? distance : null,
+            distance: distance ? distance : {},
             rating,
             services: services || [],
             isBookmarked: !!isFavorite
@@ -385,7 +387,7 @@ const getBarberListFromDB = async (user: JwtPayload, query: Record<string, any>)
 
         return {
             ...barber,
-            distance: distance ? distance : null,
+            distance: distance ? distance : {},
             rating,
             services: services || [],
             isBookmarked: !!isFavorite

@@ -4,15 +4,9 @@ import sendResponse from '../../../shared/sendResponse';
 import { StatusCodes } from 'http-status-codes';
 import { MessageService } from './message.service';
 
-const sendMessage = catchAsync(async (req: Request, res: Response) => {
+const sendMessage = catchAsync(async (req: Request, res: Response) => {;
 
-    const user = req.user.id;
-    const payload = {
-        ...req.body,
-        sender: user,
-    };
-
-    const message = await MessageService.sendMessageToDB(payload);
+    const message = await MessageService.sendMessageToDB(req.body);
     sendResponse(res, {
         statusCode: StatusCodes.OK,
         success: true,
@@ -25,7 +19,7 @@ const sendMessage = catchAsync(async (req: Request, res: Response) => {
 const getMessage = catchAsync(async (req: Request, res: Response) => {
 
     const id = req.params.id;
-    const messages = await MessageService.getMessageFromDB(id);
+    const messages = await MessageService.getMessageFromDB(req.user, id, req.query);
     sendResponse(res, {
         statusCode: StatusCodes.OK,
         success: true,

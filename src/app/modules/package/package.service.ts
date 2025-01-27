@@ -44,11 +44,11 @@ const updatePackageToDB = async(id: string, payload: IPackage): Promise<IPackage
 
     const product:any = await Package.findById(id).select("productId");
 
-    if(payload?.price || payload?.duration || payload.title){
+    /* if(payload?.price || payload?.duration || payload.title){
         const {productId, priceId}:any =  await updateSubscriptionProduct(product?.productId, payload);
         payload.priceId = priceId;
         payload.productId = productId;
-    }
+    } */
 
     const result = await Package.findByIdAndUpdate(
         {_id: id},

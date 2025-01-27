@@ -38,7 +38,7 @@ const getServiceForBarber = catchAsync(async(req: Request, res: Response)=>{
 })
 
 const holdService = catchAsync(async(req: Request, res: Response)=>{
-    const result = await ServiceService.holdServiceFromDB(req.user);
+    const result = await ServiceService.holdServiceFromDB(req.user, req.body.password);
 
     sendResponse(res, {
         statusCode: StatusCodes.OK,

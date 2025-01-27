@@ -14,7 +14,10 @@ export const handleCheckoutSession = async (data: Stripe.Checkout.Session) => {
         // mark reservation as paid;
         await Reservation.findOneAndUpdate(
             { sessionId: session.id },
-            { paymentStatus: 'Paid' },
+            { 
+                paymentStatus: 'Paid',
+                amountPaid: session.amount_total 
+            },
             { new: true }
         );
     } else {

@@ -1,30 +1,20 @@
 import { JwtPayload } from 'jsonwebtoken';
 import { INotification } from './notification.interface';
 import { Notification } from './notification.model';
+import QueryBuilder from '../../../shared/apiFeature';
 
 // get notifications
-const getNotificationFromDB = async ( user: JwtPayload ): Promise<INotification> => {
+const getNotificationFromDB = async (user: JwtPayload, query: Record<string, any>): Promise<{notifications: INotification[], pagination:any}> => {
 
-    const result = await Notification.find({ receiver: user.id }).populate({
-        path: 'sender',
-        select: 'name profile',
-    });
+    const result = new QueryBuilder(Notification.find({ receiver: user.id }), query).paginate();
+    const notifications = await result.queryModel;
+    const pagination = result.getPaginationInfo();
 
-    const unreadCount = await Notification.countDocuments({
-        receiver: user.id,
-        read: false,
-    });
-
-    const data: any = {
-        result,
-        unreadCount
-    };
-
-  return data;
+    return { notifications, pagination };
 };
 
 // read notifications only for user
-const readNotificationToDB = async ( user: JwtPayload): Promise<INotification | undefined> => {
+const readNotificationToDB = async (user: JwtPayload): Promise<INotification | undefined> => {
 
     const result: any = await Notification.updateMany(
         { receiver: user.id, read: false },

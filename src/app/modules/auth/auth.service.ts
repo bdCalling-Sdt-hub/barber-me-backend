@@ -330,17 +330,23 @@ const socialLoginFromDB = async (payload: IUser) => {
 }
 
 // delete user
-const deleteUserFromDB = async (user: JwtPayload) => {
+const deleteUserFromDB = async (user: JwtPayload, password: string) => {
 
-    const isExistUser = await User.findByIdAndDelete(user.id);
+    const isExistUser = await User.findById(user.id).select('+password');
     if (!isExistUser) {
         throw new ApiError(StatusCodes.BAD_REQUEST, "User doesn't exist!");
     }
-    await Service.updateMany(
-        { barber: user.id },
-        {status: 'Inactive'},
-        {new: true}
-    );
+
+    //check match password
+    if (password && !(await User.isMatchPassword(password, isExistUser.password))) {
+        throw new ApiError(StatusCodes.BAD_REQUEST, 'Password is incorrect');
+    }
+
+    const updateUser = await User.findByIdAndDelete(user.id);
+    if (!updateUser) {
+        throw new ApiError(StatusCodes.BAD_REQUEST, "User doesn't exist!");
+    }
+    return;
 };
 
 export const AuthService = {
