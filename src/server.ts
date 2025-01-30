@@ -7,7 +7,6 @@ import { socketHelper } from "./helpers/socketHelper";
 import { Server } from "socket.io";
 import seedSuperAdmin from "./DB";
 
-
 //uncaught exception
 process.on('uncaughtException', error => {
     errorLogger.error('uncaughtException Detected', error);

@@ -17,12 +17,11 @@ import generateOTP from '../../../util/generateOTP';
 import { ResetToken } from '../resetToken/resetToken.model';
 import { User } from '../user/user.model';
 import { IUser } from '../user/user.interface';
-import { Service } from '../service/service.model';
 
 //login
 const loginUserFromDB = async (payload: ILoginData) => {
 
-    const { email, password } = payload;
+    const { email, password, deviceToken } = payload;
     const isExistUser: any = await User.findOne({ email }).select('+password');
     if (!isExistUser) {
         throw new ApiError(StatusCodes.BAD_REQUEST, "User doesn't exist!");
@@ -37,6 +36,12 @@ const loginUserFromDB = async (payload: ILoginData) => {
     if (password && !(await User.isMatchPassword(password, isExistUser.password))) {
         throw new ApiError(StatusCodes.BAD_REQUEST, 'Password is incorrect!');
     }
+
+    await User.findOneAndUpdate(
+        { _id: isExistUser._id },
+        { deviceToken: deviceToken },
+        { new: true },
+    )
 
     //create token
     const accessToken = jwtHelper.createToken(
@@ -282,7 +287,7 @@ const resendVerificationEmailToDB = async (email: string) => {
 // social authentication
 const socialLoginFromDB = async (payload: IUser) => {
 
-    const { appId, role } = payload;
+    const { appId, role, deviceToken } = payload;
 
     const isExistUser = await User.findOne({ appId });
 
@@ -301,6 +306,12 @@ const socialLoginFromDB = async (payload: IUser) => {
             config.jwt.jwtRefreshSecret as Secret,
             config.jwt.jwtRefreshExpiresIn as string
         );
+
+        await User.findOneAndUpdate(
+            { _id: isExistUser._id },
+            { deviceToken: deviceToken },
+            { new: true },
+        )
 
         return { accessToken, refreshToken };
 
@@ -324,6 +335,12 @@ const socialLoginFromDB = async (payload: IUser) => {
             config.jwt.jwtRefreshSecret as Secret,
             config.jwt.jwtRefreshExpiresIn as string
         );
+
+        await User.findOneAndUpdate(
+            { _id: user._id },
+            { deviceToken: deviceToken },
+            { new: true },
+        )
 
         return { accessToken, refreshToken };
     }

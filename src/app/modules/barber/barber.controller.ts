@@ -79,7 +79,13 @@ const recommendedBarber = catchAsync(async (req: Request, res: Response) => {
 
 
 const getBarberList = catchAsync(async (req: Request, res: Response) => {
-    const result = await BarberService.getBarberListFromDB(req.user, req.query);
+    const token = req.body.token;
+    let user: any;
+    if(token) {
+        user = jwtHelper.verifyToken(token as string, config.jwt.jwt_secret as Secret);
+    }
+
+    const result = await BarberService.getBarberListFromDB(user, req.query);
 
     sendResponse(res, {
         statusCode: StatusCodes.OK,

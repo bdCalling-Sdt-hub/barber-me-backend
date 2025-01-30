@@ -103,7 +103,10 @@ const userSchema = new Schema<IUser, UserModal>(
         },
         discount: {
             type: Number
-        }
+        },
+        deviceToken: {
+            type: String,
+        },
     },
     {
         timestamps: true
@@ -160,7 +163,9 @@ userSchema.pre('save', async function (next) {
     }
 
     //password hash
-    user.password = await bcrypt.hash(this.password, Number(config.bcrypt_salt_rounds));
+    if(!user.appId){
+        user.password = await bcrypt.hash(this.password, Number(config.bcrypt_salt_rounds));
+    }
     next();
 });
 export const User = model<IUser, UserModal>("User", userSchema)

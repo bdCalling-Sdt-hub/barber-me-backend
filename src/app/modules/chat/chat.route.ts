@@ -5,7 +5,7 @@ import { USER_ROLES } from '../../../enums/user';
 const router = express.Router();
 
 router.post('/:id',
-    auth(USER_ROLES.CUSTOMER),
+    auth(USER_ROLES.CUSTOMER, USER_ROLES.BARBER),
     ChatController.createChat
 );
 

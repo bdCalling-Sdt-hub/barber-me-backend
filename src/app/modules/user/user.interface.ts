@@ -31,6 +31,7 @@ export type IUser = {
     profile: string;
     verified: boolean;
     discount?: number;
+    deviceToken?: string;
     authentication?: IAuthenticationProps;
     accountInformation?: IStripeAccountInfo;
 }

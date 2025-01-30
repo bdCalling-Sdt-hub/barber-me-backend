@@ -85,7 +85,7 @@ const getCustomerProfileFromDB = async (customer: string): Promise<{}> => {
     }
 
     const [customerProfile, serviceCount, totalSpend] = await Promise.all([
-        User.findById({ _id: customer }).select("name profile address gender dateOfBirth").lean(),
+        User.findById({ _id: customer }).lean(),
         Reservation.countDocuments({ customer: customer, status: "Completed", paymentStatus: "Paid" }),
         Reservation.aggregate([
             {
