@@ -13,14 +13,37 @@ router.post(
     AdminController.createAdmin
 );
 
-router.get(
-    '/get-admin',
+router.get('/get-admin',
     auth(USER_ROLES.SUPER_ADMIN),
     AdminController.getAdmin
 );
 
-router.delete(
-    '/:id',
+router.get('/revenue-statistics',
+    auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN),
+    AdminController.revenueStatistics
+);
+
+router.get('/user-statistics',
+    auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN),
+    AdminController.userStatistics
+);
+
+router.get('/count-summary',
+    auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN),
+    AdminController.countSummary
+);
+
+router.get('/user-list',
+    auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN),
+    AdminController.userList
+);
+
+router.get('/reservation-list',
+    auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN),
+    AdminController.reservationList
+);
+
+router.delete('/:id',
     auth(USER_ROLES.SUPER_ADMIN),
     AdminController.deleteAdmin
 );

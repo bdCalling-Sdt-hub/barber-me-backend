@@ -32,6 +32,20 @@ const getCategoriesFromDB = async (): Promise<ICategory[]> => {
   return result;
 }
 
+const adminCategoriesFromDB = async (): Promise<ICategory[]> => {
+  const result = await Category.find({}).lean();
+
+  const categories = await Promise.all(result.map(async (category: any) => {
+    const subCategory = await SubCategory.find({ category: category._id });
+    return {
+      ...category,
+      subCategory
+    }
+  }))
+
+  return categories;
+}
+
 const updateCategoryToDB = async (id: string, payload: ICategory) => {
 
   if (!mongoose.Types.ObjectId.isValid(id)) {
@@ -101,5 +115,6 @@ export const CategoryService = {
   getCategoriesFromDB,
   updateCategoryToDB,
   deleteCategoryToDB,
-  getCategoryForBarberFromDB
+  getCategoryForBarberFromDB,
+  adminCategoriesFromDB
 }

@@ -31,7 +31,7 @@ app.use(express.static('uploads'));
 app.use('/api/v1', router);
 
 app.get("/", (req: Request, res: Response)=>{
-    res.send("Hey, How can I assist you");
+    res.send("Hey Welcome to the Barber World. How can I assist you");
 })
 
 //global error handle

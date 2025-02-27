@@ -20,7 +20,7 @@ const createSubCategoryToDB = async (payload: ISubCategory) => {
 }
 
 const getSubCategoriesFromDB = async (): Promise<ISubCategory[]> => {
-  const result = await SubCategory.find({})
+  const result = await SubCategory.find({}).populate("category", "name image")
   return result;
 }
 

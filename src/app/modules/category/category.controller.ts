@@ -65,10 +65,24 @@ const getCategoryForBarber = catchAsync(async (req: Request, res: Response) => {
 })
 
 
+const adminGetCategories = catchAsync(async (req: Request, res: Response) => {
+
+    const result = await CategoryService.adminCategoriesFromDB()
+
+    sendResponse(res, {
+        success: true,
+        statusCode: StatusCodes.OK,
+        message: 'Admin Category successfully',
+        data: result
+    })
+})
+
+
 export const CategoryController = {
     createCategory,
     getCategories,
     updateCategory,
     deleteCategory,
-    getCategoryForBarber
+    getCategoryForBarber,
+    adminGetCategories
 }

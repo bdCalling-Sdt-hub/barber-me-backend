@@ -8,11 +8,6 @@ const subCategorySchema = new Schema<ISubCategory, SubCategoryModel>(
             ref: "Category",
             required: true
         },
-        barber: {
-            type: Schema.Types.ObjectId,
-            ref: "User",
-            required: true
-        },
         title: {
             type: String,
             required: true,

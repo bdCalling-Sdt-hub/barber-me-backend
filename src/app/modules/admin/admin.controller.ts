@@ -38,11 +38,65 @@ const getAdmin = catchAsync(async (req: Request, res: Response) => {
         message: 'Admin Retrieved Successfully',
         data: result
     });
+});
 
+const countSummary = catchAsync(async (req: Request, res: Response) => {
+    const result = await AdminService.countSummaryFromDB();
+    sendResponse(res, {
+        statusCode: StatusCodes.OK,
+        success: true,
+        message: 'Count Summary Retrieved Successfully',
+        data: result
+    });
+});
+
+const userStatistics = catchAsync(async (req: Request, res: Response) => {
+    const result = await AdminService.userStatisticsFromDB();
+    sendResponse(res, {
+        statusCode: StatusCodes.OK,
+        success: true,
+        message: 'User Statistics Retrieved Successfully',
+        data: result
+    });
+});
+
+const revenueStatistics = catchAsync(async (req: Request, res: Response) => {
+    const result = await AdminService.revenueStatisticsFromDB();
+    sendResponse(res, {
+        statusCode: StatusCodes.OK,
+        success: true,
+        message: 'Revenue Statistics Retrieved Successfully',
+        data: result
+    });
+});
+
+const userList = catchAsync(async (req: Request, res: Response) => {
+    const result = await AdminService.userListFromDB(req.query);
+    sendResponse(res, {
+        statusCode: StatusCodes.OK,
+        success: true,
+        message: 'User List Retrieved Successfully',
+        data: result
+    });
+});
+
+const reservationList = catchAsync(async (req: Request, res: Response) => {
+    const result = await AdminService.reservationListFromDB(req.query);
+    sendResponse(res, {
+        statusCode: StatusCodes.OK,
+        success: true,
+        message: 'Reservation List Retrieved Successfully',
+        data: result
+    });
 });
 
 export const AdminController = {
     deleteAdmin,
     createAdmin,
-    getAdmin
+    getAdmin,
+    userStatistics,
+    revenueStatistics,
+    countSummary,
+    userList,
+    reservationList
 };
