@@ -21,25 +21,25 @@ const createPaymentCheckoutToStripe = async (user: JwtPayload, payload: any): Pr
     }
 
     // Create a checkout session
-    const session = await stripe.checkout.sessions.create({
-        payment_method_types: ["card"],
-        mode: "payment",
-        line_items: [
-            {
-                price_data: {
-                    currency: "usd",
-                    product_data: {
-                        name: `${service_name} Service Reservation Payment`,
+        const session = await stripe.checkout.sessions.create({
+            payment_method_types: ["card"],
+            mode: "payment",
+            line_items: [
+                {
+                    price_data: {
+                        currency: "usd",
+                        product_data: {
+                            name: `${service_name} Service Reservation Payment`,
+                        },
+                        unit_amount: price ? Math.trunc(price * 100) : Math.trunc(tips * 100),
                     },
-                    unit_amount: price ? Math.trunc(price * 100) : Math.trunc(tips * 100),
+                    quantity: 1,
                 },
-                quantity: 1,
-            },
-        ],
-        customer_email: user?.email,
-        success_url: "http://10.0.80.75:6001/success",
-        cancel_url: "http://10.0.80.75:6001/errors"
-    });
+            ],
+            customer_email: user?.email,
+            success_url: "http://10.0.80.75:6001/success",
+            cancel_url: "http://10.0.80.75:6001/errors"
+        });
 
     if (!session) {
         throw new ApiError(StatusCodes.BAD_REQUEST, "Failed to create Payment Checkout");

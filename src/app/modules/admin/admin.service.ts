@@ -111,9 +111,9 @@ const userStatisticsFromDB = async () => {
 
     const usersAnalytics = await User.aggregate([
         {
-            $match: { 
-                role: { $in: ["CUSTOMER", "BARBER"] }, 
-                createdAt: { $gte: startOfYear, $lt: endOfYear } 
+            $match: {
+                role: { $in: ["CUSTOMER", "BARBER"] },
+                createdAt: { $gte: startOfYear, $lt: endOfYear }
             }
         },
         {
@@ -155,10 +155,10 @@ const revenueStatisticsFromDB = async () => {
 
     const revenueAnalytics = await Reservation.aggregate([
         {
-            $match: { 
-                status: "Completed", 
-                paymentStatus: "Paid", 
-                createdAt: { $gte: startOfYear, $lt: endOfYear } 
+            $match: {
+                status: "Completed",
+                paymentStatus: "Paid",
+                createdAt: { $gte: startOfYear, $lt: endOfYear }
             }
         },
         {
@@ -191,7 +191,27 @@ const userListFromDB = async (query: Record<string, any>) => {
 
 const reservationListFromDB = async (query: Record<string, any>) => {
     const result = new QueryBuilder(Reservation.find(), query).paginate().filter();
-    const reservations = await result.queryModel.populate('customer', "name profile" ).populate('barber', "name profile" );
+    const reservations = await result.queryModel.populate([
+        {
+            path: 'customer',
+            select: "name profile"
+        },
+        {
+            path: 'barber',
+            select: "name profile"
+        },
+        {
+            path: 'service',
+            select: "title category",
+            populate: [
+                {
+                path: 'category',
+                select: "name"
+            }
+        ]
+        }
+    ]);
+
     const pagination = await result.getPaginationInfo();
 
     return { reservations, pagination };
